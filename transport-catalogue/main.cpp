@@ -5,9 +5,10 @@
 #include <cassert>
 
 using namespace std;
-
+/*
 void test_input_reader(){
-    std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> test_query = t_c_i_r::read_query_queue();
+    std::istream a;
+    std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> test_query = t_c_i_r::read_query_queue(a);
     assert(test_query[t_c_i_r::QueryType::STOP].size() == 8);
     assert(test_query[t_c_i_r::QueryType::STOP][0].text ==  "Tolstopaltsevo: 55.611087, 37.208290");
     assert(test_query[t_c_i_r::QueryType::STOP][1].text ==  "Marushkino: 55.595884, 37.209755");
@@ -64,18 +65,17 @@ void test_stop_distance(){
     assert(r == 1800);
 
 
-}
+}*/
 
 
 int main()
 {
     TransportCatalogue t_c;
-    std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> test_query = t_c_i_r::read_query_queue();
+    std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> test_query = t_c_i_r::read_query_queue(std::cin);
     t_c_i_r::processing_query_queue(test_query, t_c);
-    t_c_o_r::read_processing_queue(t_c);
+    t_c_o_r::read_processing_queue(t_c, std::cin, std::cout);
     return 0;
 }
-
 
 /*
 10

@@ -23,10 +23,10 @@ struct Query
     QueryType type;
 };
 
-std::string read_line();
-int read_line_with_number();
+std::string read_line(std::istream& input_stream);
+int read_line_with_number(std::istream& input_stream);
 
-std::unordered_map<QueryType, std::deque<Query>> read_query_queue();
+std::unordered_map<QueryType, std::deque<Query>> read_query_queue(std::istream& input_stream);
 
 t_c_i_r::Query string_to_query(std::string& str_query);
 
@@ -34,7 +34,6 @@ void processing_query_queue(std::unordered_map<QueryType, std::deque<Query>>& q_
 
 std::vector<TransportCatalogue::Stop*> read_route_to_vector(std::string& str, TransportCatalogue& t_c, char ch);
 void string_to_distance(std::string_view name, Query* query, size_t pos, TransportCatalogue& t_c);
-
 }
 
 

@@ -3,18 +3,17 @@
 // напишите решение с нуля
 // код сохраните в свой git-репозиторий
 
-std::string t_c_i_r::read_line()
+std::string t_c_i_r::read_line(std::istream& input_stream)
 {
     std::string s;
-    getline(std::cin, s);
+    getline(input_stream, s);
     return s;
 }
 
-int t_c_i_r::read_line_with_number()
+int t_c_i_r::read_line_with_number(std::istream& input_stream)
 {
-    int result;
-    std::cin >> result;
-    t_c_i_r::read_line();
+    int result = std::stoi(t_c_i_r::read_line(input_stream));
+
     return result;
 }
 
@@ -35,13 +34,13 @@ t_c_i_r::Query t_c_i_r::string_to_query(std::string& str_query)
     return result;
 }
 
-std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> t_c_i_r::read_query_queue()
+std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> t_c_i_r::read_query_queue(std::istream& input_stream)
 {
     std::unordered_map<t_c_i_r::QueryType, std::deque<t_c_i_r::Query>> result;
-    int count_query = t_c_i_r::read_line_with_number();
+    int count_query = t_c_i_r::read_line_with_number(input_stream);
     for(int i = 0; i < count_query; ++i)
     {
-        std::string str = t_c_i_r::read_line();
+        std::string str = t_c_i_r::read_line(input_stream);
         auto query = t_c_i_r::string_to_query(str);
         result[query.type].push_back(query);
     }

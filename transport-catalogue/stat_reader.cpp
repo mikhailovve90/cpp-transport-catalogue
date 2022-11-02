@@ -2,19 +2,19 @@
 
 // напишите решение с нуля
 // код сохраните в свой git-репозиторий
-void t_c_o_r::read_processing_queue(TransportCatalogue& t_c)
+void t_c_o_r::read_processing_queue(TransportCatalogue& t_c, std::istream& input_stream, std::ostream& output_stream)
 {
-    int count_query = t_c_i_r::read_line_with_number();
+    int count_query = t_c_i_r::read_line_with_number(input_stream);
     for(int i = 0; i < count_query; ++i)
     {
-        std::string str = t_c_i_r::read_line();
+        std::string str = t_c_i_r::read_line(input_stream);
         t_c_i_r::Query query = t_c_i_r::string_to_query(str);
         std::string name = t_c_o_r::bstrip(query.text.substr(query.text.find_first_not_of(' ')));
         if(query.type == t_c_i_r::QueryType::BUS)
         {
             if(t_c.pointer_bus_name(name) != nullptr)
             {
-                bus_information(t_c.pointer_bus_name(name), t_c);
+                bus_information(t_c.pointer_bus_name(name), t_c, output_stream);
             } else
             {
                 std::cout << "Bus " << name << ": not found" << std::endl;
@@ -31,13 +31,13 @@ void t_c_o_r::read_processing_queue(TransportCatalogue& t_c)
             } else
             {
                 std::cout << "Stop " << name << ": buses";
-                stop_information(t_c.stopname_to_buses(name));
+                stop_information(t_c.stopname_to_buses(name), output_stream);
             }
         }
     }
 }
 
-void t_c_o_r::bus_information(TransportCatalogue::Bus* bus, TransportCatalogue& t_c)
+void t_c_o_r::bus_information(TransportCatalogue::Bus* bus, TransportCatalogue& t_c, std::ostream& output_stream)
 {
 
     long bus_route_lenght = t_c.calculate_distance(bus);
@@ -60,19 +60,19 @@ void t_c_o_r::bus_information(TransportCatalogue::Bus* bus, TransportCatalogue& 
          [](const TransportCatalogue::Stop* a,const TransportCatalogue::Stop* b){ return std::lexicographical_compare(a->name.begin(), a->name.end(), b->name.begin(), b->name.end()); });
          uniq_stops_count = distance(copy_route.begin(),std::unique(copy_route.begin(),copy_route.end()));
 
-    std::cout << std::setprecision(6) << "Bus " << bus->name_ << ": " << route_size << " stops on route, "
+    output_stream << std::setprecision(6) << "Bus " << bus->name_ << ": " << route_size << " stops on route, "
     << uniq_stops_count << " unique stops, "
     << static_cast<double>(bus_route_lenght) << " route length"
     <<  ", " << bus_route_lenght/bus_route_lenght_geo << " curvature" << std::endl;
 }
 
-void t_c_o_r::stop_information(const std::set<TransportCatalogue::Bus*, TransportCatalogue::bus_compare>& buses)
+void t_c_o_r::stop_information(const std::set<TransportCatalogue::Bus*, TransportCatalogue::bus_compare>& buses, std::ostream& output_stream)
 {
     for(const auto bus : buses)
     {
-        std::cout << " " << bus->name_;
+        output_stream << " " << bus->name_;
     }
-    std::cout << std::endl;
+    output_stream << std::endl;
 }
 
 std::string t_c_o_r::bstrip(std::string line)
