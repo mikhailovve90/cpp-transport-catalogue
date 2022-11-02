@@ -34,7 +34,7 @@ void test_add_stop_and_bus(){
     assert(t_c_stops[1].name == "Marushkino");
     assert(t_c_stops[1].latitude - 55.595884 < std::abs(0.00000001));
     assert(t_c_stops[1].longitude - 37.209755 < std::abs(0.00000001));
-    assert(t_c.pointer_stop_name("Marushkino") == &t_c_stops[1]);
+    assert(t_c.pointer_stop_name("Marushkino") == &t_c_stops[1]);//
 
     auto& t_c_buses = t_c.buses_return();
     assert(t_c_buses[0].name_ == "256");
