@@ -7,6 +7,7 @@
 #include <iostream>
 #include <optional>
 #include "domain.h"
+#include "transport_catalogue.h"
 /*
  * В этом файле вы можете разместить код, отвечающий за визуализацию карты маршрутов в формате SVG.
  * Визуализация маршрутов вам понадобится во второй части итогового проекта.
@@ -105,12 +106,33 @@ class SphereProjector {
     double zoom_coeff_ = 0;
 };
 
-SphereProjector print_coordinates(const std::set<Bus*, bus_compare>& buses, RenderSettings& r_s);
 
-svg::Document& print_route_line(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
+
+class MapRender {
+public:
+    MapRender(const TransportCatalogue& t_c, const RenderSettings& rs):buses_(t_c.all_buses()), r_s(rs), proj(print_coordinates()) {};
+    void print_route_line();
+    void print_bus_name();
+    void print_stop_circle();
+    void print_stop_name();
+    svg::Document& get_svg_doc() {return svg_doc;}
+
+    void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p);
+    void stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point p);
+    SphereProjector print_coordinates();
+private:
+    svg::Document svg_doc;
+    const std::set<Bus*, bus_compare>& buses_;
+    const RenderSettings& r_s;
+    SphereProjector proj;
+};
+
+
+
+/*svg::Document& print_route_line(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
 svg::Document& print_bus_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
 svg::Document& print_stop_circle(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
 svg::Document& print_stop_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
 
-void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_s);
-void stopname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_s);
+void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_c);
+void stopname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_c);*/

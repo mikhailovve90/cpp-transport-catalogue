@@ -15,21 +15,18 @@
 // код сохраните в свой git-репозиторий
 class TransportCatalogue {
   public:
-//Структура остановки, мувлю имя
-
-
     void add_stop(const std::string& name, double lat, double lon);
     void add_distance_to_stop(std::string_view name1, std::string_view name2, long dist);
-    std::deque<Stop>& stops_return();
-    std::deque<Bus>& buses_return();
-    Stop* pointer_stop_name(std::string_view name);
-    Bus* pointer_bus_name(std::string_view name);
-    const std::set<Bus*, bus_compare>& stopname_to_buses(const std::string_view name);
+    std::deque<Stop>& get_stops();
+    std::deque<Bus>& get_buses();
+    Stop* pointer_stop_name(std::string_view name) const;
+    Bus* pointer_bus_name(std::string_view name) const;
+    const std::set<Bus*, bus_compare>& stopname_to_buses(const std::string_view name) const;
     void add_bus(const std::string& name, std::vector<Stop*>& stops, bool ring);
-    long distancse_2stops(std::string_view name1, std::string_view name2);
-    bool exists_distance(std::string_view name1, std::string_view name2);
-    long calculate_distance(Bus* bus);
-    const std::set<Bus*, bus_compare>& all_buses();
+    long get_distance_between_stops(std::string_view name1, std::string_view name2) const;
+    bool exists_distance(std::string_view name1, std::string_view name2) const;
+    long calculate_distance(Bus* bus) const;
+    const std::set<Bus*, bus_compare>& all_buses() const;
 
   private:
     std::deque<Stop> stops_;//контейнер существующих остановок

@@ -2,6 +2,8 @@
 
 namespace geo {
 
+const long earth_radius = 6371000;
+
 struct Coordinates {
     double lat; // Широта
     double lng; // Долгота

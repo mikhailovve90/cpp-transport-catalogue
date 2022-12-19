@@ -5,6 +5,7 @@
 
 namespace geo {
 
+
 double ComputeDistance(Coordinates from, Coordinates to) {
     using namespace std;
     if (from == to) {
