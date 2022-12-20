@@ -2,19 +2,19 @@
 
 namespace svg {
 
-void PrintColor(std::ostream& out, std::monostate)  {
+void printColor(std::ostream& out, std::monostate)  {
     out << "none";
 }
 
-void PrintColor(std::ostream& out, std::string name) {
+void printColor(std::ostream& out, std::string name) {
     out << name;
 }
 
-void PrintColor(std::ostream& out, svg::Rgb rgb)  {
+void printColor(std::ostream& out, svg::Rgb rgb)  {
     out << "rgb(" << static_cast<short>(rgb.red) << "," << static_cast<short>(rgb.green) << "," << static_cast<short>(rgb.blue) << ")";
 }
 
-void PrintColor(std::ostream& out, svg::Rgba& rgba) {
+void printColor(std::ostream& out, svg::Rgba& rgba) {
     out << "rgba(" << static_cast<short>(rgba.red) << "," << static_cast<short>(rgba.green) << "," << static_cast<short>(rgba.blue) << "," << rgba.opacity << ")";
 }
 
@@ -22,8 +22,8 @@ std::ostream& operator<<(std::ostream &os, const Color &col) {
     visit(
     [&os](auto value) {
         // Это универсальная лямбда-функция (generic lambda).
-        // Внутри неё нужная функция PrintRoots будет выбрана за счёт перегрузки функций.
-        PrintColor(os, value);
+        // Внутри неё нужная функция printRoots будет выбрана за счёт перегрузки функций.
+        printColor(os, value);
     }, col);
     return os;
 }
@@ -32,8 +32,8 @@ std::ostream& operator<<(std::ostream &os, const std::optional<Color> &col) {
     visit(
     [&os](auto value) {
         // Это универсальная лямбда-функция (generic lambda).
-        // Внутри неё нужная функция PrintRoots будет выбрана за счёт перегрузки функций.
-        PrintColor(os, value);
+        // Внутри неё нужная функция printRoots будет выбрана за счёт перегрузки функций.
+        printColor(os, value);
     }, col.value());
     return os;
 }

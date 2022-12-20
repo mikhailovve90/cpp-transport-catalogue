@@ -53,13 +53,13 @@ inline const Color NoneColor{"none"};
 std::ostream& operator<<(std::ostream &os, const Color &col);
 std::ostream& operator<<(std::ostream &os, const std::optional<Color> &col);
 
-void PrintColor(std::ostream& out, std::monostate);
+void printColor(std::ostream& out, std::monostate);
 
-void PrintColor(std::ostream& out, std::string name);
+void printColor(std::ostream& out, std::string name);
 
-void PrintColor(std::ostream& out, svg::Rgb rgb);
+void printColor(std::ostream& out, svg::Rgb rgb);
 
-void PrintColor(std::ostream& out, svg::Rgba& rgba);
+void printColor(std::ostream& out, svg::Rgba& rgba);
 
 std::string& text_to_svg_format(std::string& text);
 

@@ -15,6 +15,6 @@ struct Coordinates {
     }
 };
 
-double ComputeDistance(Coordinates from, Coordinates to);
+double compute_distance(Coordinates from, Coordinates to);
 
 }  // namespace geo

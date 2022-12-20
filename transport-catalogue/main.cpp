@@ -1,14 +1,12 @@
 #include "json_reader.h"
+#include "request_handler.h"
 
 int main() {
      TransportCatalogue t_c;
      RenderSettings r_s;
-     json::Document doc = read_json(std::cin);
-     JsonProcessing v(doc);
-     v.json_to_tc(t_c).json_to_rs(r_s);
-     MapRender m_r(t_c, r_s);
-     RequestHandler r_h(t_c, m_r);
-
-     const auto stat_req = v.json_stat_from_tc(r_h);
-     json::PrintValue(stat_req, std::cout);
+     json_reader::JSONReader v(std::cin);
+     v.parse_transport_catalogue(t_c).parse_render_settings(r_s);
+     MapRenderer m_r(t_c, r_s);
+     RequestHandler r_h(t_c, m_r, v);
+     json::render_value(r_h.processing_requests(), std::cout);
 }

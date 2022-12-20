@@ -4,21 +4,21 @@
  * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
  * а также код обработки запросов к базе и формирование массива ответов в формате JSON
  */
-json::Document read_json(std::istream& input_stream) {
+json::Document json_reader::JSONReader::read_json(std::istream& input_stream) {
     return json::Load(input_stream);
 }
 
-JsonProcessing& JsonProcessing::json_to_tc(TransportCatalogue& t_c) {
-    std::vector<json::Node> base_req = doc_being_proc.GetRoot().AsMap().at("base_requests").AsArray();
+json_reader::JSONReader& json_reader::JSONReader::parse_transport_catalogue(TransportCatalogue& t_c) {
+    std::vector<json::Node> base_req = doc_being_proc.get_root().as_map().at("base_requests").as_array();
     std::unordered_map<std::string, std::deque<std::pair<std::string, int>>> dist_map;
 
     for(const json::Node& n_d : base_req) {
-        auto& map_node = n_d.AsMap();
+        auto& map_node = n_d.as_map();
         if(map_node.count("type")) {
-            if(map_node.at("type").AsString() == "Stop") {
-                t_c.add_stop(map_node.at("name").AsString(), map_node.at("latitude").AsDouble(), map_node.at("longitude").AsDouble());
-                for(const auto[stop_name, dist] : map_node.at("road_distances").AsMap()) {
-                    dist_map[map_node.at("name").AsString()].push_back(std::pair(stop_name, dist.AsInt()));
+            if(map_node.at("type").as_string() == "Stop") {
+                t_c.add_stop(map_node.at("name").as_string(), map_node.at("latitude").as_double(), map_node.at("longitude").as_double());
+                for(const auto[stop_name, dist] : map_node.at("road_distances").as_map()) {
+                    dist_map[map_node.at("name").as_string()].push_back(std::pair(stop_name, dist.as_int()));
                 }
             }
         }
@@ -32,97 +32,97 @@ JsonProcessing& JsonProcessing::json_to_tc(TransportCatalogue& t_c) {
 
     for(const json::Node& n_d : base_req) {
         std::vector<Stop*> route;
-        auto& map_node = n_d.AsMap();
+        auto& map_node = n_d.as_map();
         if(map_node.count("type")) {
-            if(map_node.at("type").AsString() == "Bus") {
-                for(const json::Node stop : map_node.at("stops").AsArray()) {
-                    route.push_back(t_c.pointer_stop_name(stop.AsString()));
+            if(map_node.at("type").as_string() == "Bus") {
+                for(const json::Node stop : map_node.at("stops").as_array()) {
+                    route.push_back(t_c.pointer_stop_name(stop.as_string()));
                 }
-                if(map_node.at("is_roundtrip").AsBool()) {
-                    route.push_back(t_c.pointer_stop_name(map_node.at("stops").AsArray()[0].AsString()));
+                if(map_node.at("is_roundtrip").as_bool()) {
+                    route.push_back(t_c.pointer_stop_name(map_node.at("stops").as_array()[0].as_string()));
                 }
-                t_c.add_bus(map_node.at("name").AsString(), route, map_node.at("is_roundtrip").AsBool());
+                t_c.add_bus(map_node.at("name").as_string(), route, map_node.at("is_roundtrip").as_bool());
             }
         }
     }
     return *this;
 }
 
-svg::Color JsonProcessing::set_rgb_rgba_color(const std::vector<json::Node>& c_array) {
+svg::Color json_reader::JSONReader::set_rgb_rgba_color(const std::vector<json::Node>& c_array) {
     if(c_array.size() == 3) {
-        return svg::Color(svg::Rgb(c_array[0].AsInt(),
-                                              c_array[1].AsInt(),
-                                              c_array[2].AsInt()));
+        return svg::Color(svg::Rgb(c_array[0].as_int(),
+                                              c_array[1].as_int(),
+                                              c_array[2].as_int()));
     } else if (c_array.size() == 4) {
-        return svg::Color(svg::Rgba(c_array[0].AsInt(),
-                                           c_array[1].AsInt(),
-                                           c_array[2].AsInt(),
-                                           c_array[3].AsDouble()));
+        return svg::Color(svg::Rgba(c_array[0].as_int(),
+                                           c_array[1].as_int(),
+                                           c_array[2].as_int(),
+                                           c_array[3].as_double()));
     }
 
     return svg::NoneColor;
 }
 
-void JsonProcessing::set_color_pallete(const std::vector<json::Node>& c_p_array, RenderSettings& r_s) {
+void json_reader::JSONReader::set_color_pallete(const std::vector<json::Node>& c_p_array, RenderSettings& r_s) {
     for(size_t s_t = 0; s_t < c_p_array.size(); s_t++) {
-        if(c_p_array.at(s_t).IsString()) {
-            r_s.color_palette.push_back(svg::Color(c_p_array.at(s_t).AsString()));
+        if(c_p_array.at(s_t).is_string()) {
+            r_s.color_palette.push_back(svg::Color(c_p_array.at(s_t).as_string()));
             continue;
-        } else if(c_p_array.at(s_t).IsArray()) {
-            r_s.color_palette.push_back(set_rgb_rgba_color(c_p_array.at(s_t).AsArray()));
+        } else if(c_p_array.at(s_t).is_array()) {
+            r_s.color_palette.push_back(set_rgb_rgba_color(c_p_array.at(s_t).as_array()));
             continue;
         }
     }
 }
 
 
-JsonProcessing& JsonProcessing::json_to_rs(RenderSettings& r_s) {
-    json::Dict ren_set = doc_being_proc.GetRoot().AsMap().at("render_settings").AsMap();
-    r_s.width = ren_set["width"].AsDouble();
-    r_s.height = ren_set["height"].AsDouble();
+json_reader::JSONReader& json_reader::JSONReader::parse_render_settings(RenderSettings& r_s) {
+    json::Dict ren_set = doc_being_proc.get_root().as_map().at("render_settings").as_map();
+    r_s.width = ren_set["width"].as_double();
+    r_s.height = ren_set["height"].as_double();
 
-    if(ren_set["padding"].AsDouble() < 0) {
+    if(ren_set["padding"].as_double() < 0) {
         r_s.padding = 0;
     } else {
-        r_s.padding = ren_set["padding"].AsDouble();
+        r_s.padding = ren_set["padding"].as_double();
     }
 
-    r_s.line_width = ren_set["line_width"].AsDouble();
-    r_s.stop_radius = ren_set["stop_radius"].AsDouble();
+    r_s.line_width = ren_set["line_width"].as_double();
+    r_s.stop_radius = ren_set["stop_radius"].as_double();
 
-    r_s.bus_label_font_size = ren_set["bus_label_font_size"].AsDouble();
-    for(size_t s_t = 0; s_t < ren_set["bus_label_offset"].AsArray().size(); s_t++) {
-        r_s.bus_label_offset.push_back(ren_set["bus_label_offset"].AsArray()[s_t].AsDouble());
+    r_s.bus_label_font_size = ren_set["bus_label_font_size"].as_double();
+    for(size_t s_t = 0; s_t < ren_set["bus_label_offset"].as_array().size(); s_t++) {
+        r_s.bus_label_offset.push_back(ren_set["bus_label_offset"].as_array()[s_t].as_double());
     }
 
-    r_s.stop_label_font_size = ren_set["stop_label_font_size"].AsInt();
-    for(size_t s_t = 0; s_t < ren_set["stop_label_offset"].AsArray().size(); s_t++) {
-        r_s.stop_label_offset.push_back(ren_set["stop_label_offset"].AsArray()[s_t].AsDouble());
+    r_s.stop_label_font_size = ren_set["stop_label_font_size"].as_int();
+    for(size_t s_t = 0; s_t < ren_set["stop_label_offset"].as_array().size(); s_t++) {
+        r_s.stop_label_offset.push_back(ren_set["stop_label_offset"].as_array()[s_t].as_double());
     }
 
-    set_color_pallete(ren_set["color_palette"].AsArray(), r_s);
+    set_color_pallete(ren_set["color_palette"].as_array(), r_s);
 
-    for(size_t s_t = 0; s_t < ren_set["stop_label_offset"].AsArray().size(); s_t++) {
-        r_s.bus_label_offset.push_back(ren_set["stop_label_offset"].AsArray()[s_t].AsDouble());
+    for(size_t s_t = 0; s_t < ren_set["stop_label_offset"].as_array().size(); s_t++) {
+        r_s.bus_label_offset.push_back(ren_set["stop_label_offset"].as_array()[s_t].as_double());
     }
 
-    r_s.underlayer_width = ren_set["underlayer_width"].AsDouble();
+    r_s.underlayer_width = ren_set["underlayer_width"].as_double();
 
-    if(ren_set["underlayer_color"].IsString()) {
-        r_s.underlayer_color = svg::Color(ren_set["underlayer_color"].AsString());
-    } else if (ren_set["underlayer_color"].IsArray() ) {
-        r_s.underlayer_color  = set_rgb_rgba_color(ren_set["underlayer_color"].AsArray());
+    if(ren_set["underlayer_color"].is_string()) {
+        r_s.underlayer_color = svg::Color(ren_set["underlayer_color"].as_string());
+    } else if (ren_set["underlayer_color"].is_array() ) {
+        r_s.underlayer_color  = set_rgb_rgba_color(ren_set["underlayer_color"].as_array());
     }
     return *this;
 }
 
 
-json::Dict JsonProcessing::error_dict(int id) {
+json::Dict json_reader::JSONReader::error_dict(int id) {
     return {{"request_id", id},
         {"error_message", json::Node(err_msg)}};
 }
 
-std::string& JsonProcessing::svg_to_json_format(std::string& text) {
+std::string& json_reader::JSONReader::svg_to_json_format(std::string& text) {
     std::deque<std::pair<char, std::string>> dictionary = {
         std::make_pair('\\', "\\"),
         std::make_pair('"' , "\""),
@@ -138,36 +138,34 @@ std::string& JsonProcessing::svg_to_json_format(std::string& text) {
     }
       return text;
 }
-
-std::vector<json::Node> JsonProcessing::json_stat_from_tc(RequestHandler& r_h) {
-    std::vector<json::Node> stat_requests = doc_being_proc.GetRoot().AsMap().at("stat_requests").AsArray();
+/*
+std::vector<json::Node> json_reader::JSONReader::json_stat_from_tc(std::vector<json::Node>& stat_requests) {
     std::vector<json::Node> result;
-
     for(const json::Node& n_d : stat_requests) {
-        auto& map_node = n_d.AsMap();
-        if(map_node.at("type").AsString() == "Stop") {
-            if(r_h.get_ref_to_t_c().pointer_stop_name(map_node.at("name").AsString()) == nullptr) {
-                result.push_back(error_dict(map_node.at("id").AsInt()));
+        auto& map_node = n_d.as_map();
+        if(map_node.at("type").as_string() == "Stop") {
+            if(r_h.get_transport_catalogue().pointer_stop_name(map_node.at("name").as_string()) == nullptr) {
+                result.push_back(error_dict(map_node.at("id").as_int()));
             } else {
-                const std::set<Bus*, bus_compare>& buses = r_h.get_ref_to_t_c().stopname_to_buses(map_node.at("name").AsString());
+                const std::set<Bus*, bus_compare>& buses = r_h.get_transport_catalogue().stopname_to_buses(map_node.at("name").as_string());
                 std::vector<json::Node> buses_name;
                 for(const auto bus : buses) {
                     buses_name.push_back(json::Node(bus->name_));
                 }
 
-                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").AsInt())},
+                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
                     {"buses", json::Node(buses_name)}
                 };
                 result.push_back(good_req);
             }
-        } else if(map_node.at("type").AsString() == "Bus") {
-            if(r_h.get_ref_to_t_c().pointer_bus_name(map_node.at("name").AsString()) == nullptr) {
-                result.push_back(error_dict(map_node.at("id").AsInt()));
+        } else if(map_node.at("type").as_string() == "Bus") {
+            if(r_h.get_transport_catalogue().pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
+                result.push_back(error_dict(map_node.at("id").as_int()));
             } else {
-                const auto a = map_node.at("name").AsString();
-                BusInfo b_i = r_h.get_bus_info(r_h.get_ref_to_t_c().pointer_bus_name(map_node.at("name").AsString()));
+                const auto a = map_node.at("name").as_string();
+                BusInfo b_i = r_h.get_bus_info(r_h.get_transport_catalogue().pointer_bus_name(map_node.at("name").as_string()));
 
-                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").AsInt())},
+                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
                     {"curvature", b_i.curvature_},
                     {"route_length", b_i.route_length_},
                     {"stop_count", b_i.stop_count_},
@@ -176,20 +174,19 @@ std::vector<json::Node> JsonProcessing::json_stat_from_tc(RequestHandler& r_h) {
 
                 result.push_back(good_req);
             }
-        } else if(map_node.at("type").AsString() == "Map") {
+        } else if(map_node.at("type").as_string() == "Map") {
             svg::Document svg_doc;
             std::ostringstream out;
-            r_h.print_map(out);
+            r_h.render_map(out);
             std::string svg_str = out.str();
             svg_to_json_format(svg_str);
 
-            json::Dict svg_dict = {{"request_id", json::Node(map_node.at("id").AsInt())}, {"map" , json::Node(svg_str)}};
+            json::Dict svg_dict = {{"request_id", json::Node(map_node.at("id").as_int())}, {"map" , json::Node(svg_str)}};
 
             result.push_back(svg_dict);
         }
     }
     return result;
-}
-
+}*/
 
 

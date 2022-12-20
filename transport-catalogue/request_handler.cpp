@@ -7,7 +7,7 @@ BusInfo RequestHandler::get_bus_info(Bus* bus) {
 
     double bus_route_lenght_geo = 0;
     for(size_t t = 0; t < bus->route_.size() - 1 ; ++t) {
-        bus_route_lenght_geo += geo::ComputeDistance({bus->route_[t]->latitude, bus->route_[t]->longitude}, {bus->route_[t+1]->latitude, bus->route_[t+1]->longitude});
+        bus_route_lenght_geo += geo::compute_distance({bus->route_[t]->latitude, bus->route_[t]->longitude}, {bus->route_[t+1]->latitude, bus->route_[t+1]->longitude});
     }
     if(!bus->its_ring()) {
         bus_route_lenght_geo *= 2;
@@ -29,16 +29,64 @@ BusInfo RequestHandler::get_bus_info(Bus* bus) {
 }
 
 
-void RequestHandler::print_map(std::ostream& out) {
-     m_r_.print_route_line();
-     m_r_.print_bus_name();
-     m_r_.print_stop_circle();
-     m_r_.print_stop_name();
+void RequestHandler::render_map(std::ostream& out) {
+     m_r_.render_route_line();
+     m_r_.render_bus_name();
+     m_r_.render_stop_circle();
+     m_r_.render_stop_name();
      m_r_.get_svg_doc().Render(out);
 }
 
-void processing_requests(RequestHandler& r_h ,std::ostream& out) {
- //   std::vector<json::Node> result = j_p.json_stat_from_tc(r_h);
- //   json::PrintValue(result, out);
+std::vector<json::Node> RequestHandler::processing_requests() {
+    std::vector<json::Node> requests = doc_.get_doc().get_root().as_map().at("stat_requests").as_array();
+
+    std::vector<json::Node> result;
+    for(const json::Node& n_d : requests) {
+        auto& map_node = n_d.as_map();
+        if(map_node.at("type").as_string() == "Stop") {
+            if(t_c_.pointer_stop_name(map_node.at("name").as_string()) == nullptr) {
+                result.push_back(doc_.error_dict(map_node.at("id").as_int()));
+            } else {
+                const std::set<Bus*, bus_compare>& buses = t_c_.stopname_to_buses(map_node.at("name").as_string());
+                std::vector<json::Node> buses_name;
+                for(const auto bus : buses) {
+                    buses_name.push_back(json::Node(bus->name_));
+                }
+
+                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
+                    {"buses", json::Node(buses_name)}
+                };
+                result.push_back(good_req);
+            }
+        } else if(map_node.at("type").as_string() == "Bus") {
+            if(t_c_.pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
+                result.push_back(doc_.error_dict(map_node.at("id").as_int()));
+            } else {
+                const auto a = map_node.at("name").as_string();
+                BusInfo b_i = this->get_bus_info(t_c_.pointer_bus_name(map_node.at("name").as_string()));
+
+                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
+                    {"curvature", b_i.curvature_},
+                    {"route_length", b_i.route_length_},
+                    {"stop_count", b_i.stop_count_},
+                    {"unique_stop_count", b_i.unique_stop_count_}
+                };
+
+                result.push_back(good_req);
+            }
+        } else if(map_node.at("type").as_string() == "Map") {
+            svg::Document svg_doc;
+            std::ostringstream out;
+            this->render_map(out);
+            std::string svg_str = out.str();
+            doc_.svg_to_json_format(svg_str);
+
+            json::Dict svg_dict = {{"request_id", json::Node(map_node.at("id").as_int())}, {"map" , json::Node(svg_str)}};
+
+            result.push_back(svg_dict);
+        }
+    }
+    return result;
 }
+
 

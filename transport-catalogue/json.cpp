@@ -13,88 +13,88 @@ bool operator!=(const Node& lhs, const Node& rhs) {
 }
 
 bool operator==(const Document& lhs, const Document& rhs) {
-    return lhs.GetRoot() == rhs.GetRoot();
+    return lhs.get_root() == rhs.get_root();
 }
 bool operator!=(const Document& lhs, const Document& rhs) {
     return !(lhs==rhs);
 }
 
-bool Node::IsInt() const {
+bool Node::is_int() const {
     if(value_.index() == 4) {
         return true;
     }
     return false;
 }
-bool Node::IsDouble() const {
+bool Node::is_double() const {
     if(value_.index() >= 4 && value_.index() <= 5) {
         return true;
     }
     return false;
 }
-bool Node::IsBool() const {
+bool Node::is_bool() const {
     if(value_.index() == 3) {
         return true;
     }
     return false;
 }
-bool Node::IsPureDouble() const {
+bool Node::is_pure_double() const {
     if(value_.index() == 5) {
         return true;
     }
     return false;
 }
-bool Node::IsNull() const {
+bool Node::is_null() const {
     if(value_.index() == 0) {
         return true;
     }
     return false;
 }
-bool Node::IsString() const {
+bool Node::is_string() const {
     if(value_.index() == 6) {
         return true;
     }
     return false;
 }
-bool Node::IsArray() const {
+bool Node::is_array() const {
     if(value_.index() == 1) {
         return true;
     }
     return false;
 }
-bool Node::IsMap() const {
+bool Node::is_map() const {
     if(value_.index() == 2) {
         return true;
     }
     return false;
 }
 
-int Node::AsInt() const {
-    if(this->IsInt()) {
+int Node::as_int() const {
+    if(this->is_int()) {
         return std::get<int>(value_);
     }
     throw std::logic_error("Node not contain int");
 }
 
-bool Node::AsBool() const {
-    if(this->IsBool()) {
+bool Node::as_bool() const {
+    if(this->is_bool()) {
         return std::get<bool>(value_);
     }
     throw std::logic_error("Node not contain bool");
 
 }
 
-double Node::AsDouble() const {
-    if(this->IsPureDouble()) {
+double Node::as_double() const {
+    if(this->is_pure_double()) {
         return std::get<double>(value_);
     }
-    if(this->IsInt()) {
+    if(this->is_int()) {
         return static_cast<double>(std::get<int>(value_));
     }
     throw std::logic_error("Node not contain double or int");
 }
 
-const std::string& Node::AsString() const {
-    if(this->IsString()) {
+const std::string& Node::as_string() const {
+    if(this->is_string()) {
         return std::get<std::string>(value_);
     }
     throw std::logic_error("Node not contain string");
@@ -102,15 +102,15 @@ const std::string& Node::AsString() const {
 
 
 
-const Array& Node::AsArray() const {
-    if(this->IsArray()) {
+const Array& Node::as_array() const {
+    if(this->is_array()) {
         return std::get<Array>(value_);
     }
     throw std::logic_error("Node not contain array");
 }
 
-const Dict& Node::AsMap() const {
-    if(this->IsMap()) {
+const Dict& Node::as_map() const {
+    if(this->is_map()) {
         return std::get<Dict>(value_);
     }
     throw std::logic_error("Node not contain map");
@@ -143,7 +143,7 @@ Node::Node(bool b)
 Node::Node() {}
 Node::Node(void*) {}
 
-void PrintValue(const bool value, std::ostream& out) {
+void render_value(const bool value, std::ostream& out) {
     if(value) {
         out << "true";
     } else {
@@ -151,19 +151,19 @@ void PrintValue(const bool value, std::ostream& out) {
     }
 }
 
-void PrintValue(const int value, std::ostream& out) {
+void render_value(const int value, std::ostream& out) {
     out << value;
 }
 
-void PrintValue(const double value, std::ostream& out) {
+void render_value(const double value, std::ostream& out) {
     out << value;
 }
 
-void PrintValue(std::nullptr_t, std::ostream& out) {
+void render_value(std::nullptr_t, std::ostream& out) {
     out << "null";
 }
 
-void PrintValue(const std::string& str, std::ostream& out) {
+void render_value(const std::string& str, std::ostream& out) {
     using namespace std::literals;
     out << "\"";
 
@@ -192,41 +192,41 @@ void PrintValue(const std::string& str, std::ostream& out) {
     out << "\"";
 }
 
-void PrintValue(const Array& arr, std::ostream& out) {
+void render_value(const Array& arr, std::ostream& out) {
     bool flag = false;
     out << "[";
     for(const auto  value : arr) {
         if(!flag) {
-            PrintNode(value, out);
+            render_node(value, out);
             flag = true;
         } else {
             out << ",";
-            PrintNode(value, out);
+            render_node(value, out);
         }
     }
     out << "]";
 }
 
-void PrintValue(const std::map<std::string, Node>& dict, std::ostream& out) {
+void render_value(const std::map<std::string, Node>& dict, std::ostream& out) {
     bool flag = false;
     out << "{";
     for(const auto [key, value] : dict) {
         if(!flag) {
             out << "\"" << key << "\": ";
-            PrintNode(value, out);
+            render_node(value, out);
             flag = true;
         } else {
             out << ",\"" << key << "\": ";
-            PrintNode(value, out);
+            render_node(value, out);
         }
     }
     out << "}";
 }
 
-void PrintNode(const Node& node, std::ostream& out) {
+void render_node(const Node& node, std::ostream& out) {
     std::visit(
     [&out](const auto& value) {
-        PrintValue(value, out);
+        render_value(value, out);
     },
     node.GetValue());
 }
@@ -502,7 +502,7 @@ Document::Document(Node root)
     : root_(move(root)) {
 }
 
-const Node& Document::GetRoot() const {
+const Node& Document::get_root() const {
     return root_;
 }
 
@@ -510,8 +510,8 @@ Document Load(istream& input) {
     return Document{LoadNode(input)};
 }
 
-void Print(const Document& doc, std::ostream& output) {
-    PrintNode(doc.GetRoot(), output);
+void print(const Document& doc, std::ostream& output) {
+    render_node(doc.get_root(), output);
 }
 
 }  // namespace json

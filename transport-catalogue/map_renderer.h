@@ -108,31 +108,31 @@ class SphereProjector {
 
 
 
-class MapRender {
+class MapRenderer {
 public:
-    MapRender(const TransportCatalogue& t_c, const RenderSettings& rs):buses_(t_c.all_buses()), r_s(rs), proj(print_coordinates()) {};
-    void print_route_line();
-    void print_bus_name();
-    void print_stop_circle();
-    void print_stop_name();
+    MapRenderer(const TransportCatalogue& t_c, const RenderSettings& rs):buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
+    void render_route_line();
+    void render_bus_name();
+    void render_stop_circle();
+    void render_stop_name();
     svg::Document& get_svg_doc() {return svg_doc;}
 
     void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p);
     void stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point p);
-    SphereProjector print_coordinates();
+    SphereProjector render_coordinates();
 private:
     svg::Document svg_doc;
     const std::set<Bus*, bus_compare>& buses_;
-    const RenderSettings& r_s;
+    const RenderSettings& render_settings;
     SphereProjector proj;
 };
 
 
 
-/*svg::Document& print_route_line(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
-svg::Document& print_bus_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
-svg::Document& print_stop_circle(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
-svg::Document& print_stop_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& r_s, svg::Document& svg_doc);
+/*svg::Document& render_route_line(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
+svg::Document& render_bus_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
+svg::Document& renderender_settingstop_circle(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
+svg::Document& renderender_settingstop_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
 
 void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_c);
 void stopname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_c);*/
