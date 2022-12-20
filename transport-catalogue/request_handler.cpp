@@ -42,22 +42,9 @@ std::vector<json::Node> RequestHandler::processing_requests() {
 
     std::vector<json::Node> result;
     for(const json::Node& n_d : requests) {
-        auto& map_node = n_d.as_map();
+        const std::map<std::string, json::Node>& map_node = n_d.as_map();
         if(map_node.at("type").as_string() == "Stop") {
-            if(t_c_.pointer_stop_name(map_node.at("name").as_string()) == nullptr) {
-                result.push_back(doc_.error_dict(map_node.at("id").as_int()));
-            } else {
-                const std::set<Bus*, bus_compare>& buses = t_c_.stopname_to_buses(map_node.at("name").as_string());
-                std::vector<json::Node> buses_name;
-                for(const auto bus : buses) {
-                    buses_name.push_back(json::Node(bus->name_));
-                }
-
-                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
-                    {"buses", json::Node(buses_name)}
-                };
-                result.push_back(good_req);
-            }
+              answer_.push_back(doc_.stop_req_processing(map_node, t_c_));
         } else if(map_node.at("type").as_string() == "Bus") {
             if(t_c_.pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
                 result.push_back(doc_.error_dict(map_node.at("id").as_int()));

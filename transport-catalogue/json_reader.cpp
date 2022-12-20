@@ -117,7 +117,7 @@ json_reader::JSONReader& json_reader::JSONReader::parse_render_settings(RenderSe
 }
 
 
-json::Dict json_reader::JSONReader::error_dict(int id) {
+json::Dict json_reader::JSONReader::error_dict(int id) const {
     return {{"request_id", id},
         {"error_message", json::Node(err_msg)}};
 }
@@ -138,28 +138,29 @@ std::string& json_reader::JSONReader::svg_to_json_format(std::string& text) {
     }
       return text;
 }
-/*
-std::vector<json::Node> json_reader::JSONReader::json_stat_from_tc(std::vector<json::Node>& stat_requests) {
-    std::vector<json::Node> result;
-    for(const json::Node& n_d : stat_requests) {
-        auto& map_node = n_d.as_map();
-        if(map_node.at("type").as_string() == "Stop") {
-            if(r_h.get_transport_catalogue().pointer_stop_name(map_node.at("name").as_string()) == nullptr) {
-                result.push_back(error_dict(map_node.at("id").as_int()));
-            } else {
-                const std::set<Bus*, bus_compare>& buses = r_h.get_transport_catalogue().stopname_to_buses(map_node.at("name").as_string());
-                std::vector<json::Node> buses_name;
-                for(const auto bus : buses) {
-                    buses_name.push_back(json::Node(bus->name_));
-                }
 
-                json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
-                    {"buses", json::Node(buses_name)}
-                };
-                result.push_back(good_req);
-            }
-        } else if(map_node.at("type").as_string() == "Bus") {
-            if(r_h.get_transport_catalogue().pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
+json::Node json_reader::JSONReader::stop_req_processing(const std::map<std::string, json::Node>& map_node, const TransportCatalogue& t_c) const {
+    if(t_c.pointer_stop_name(map_node.at("name").as_string()) == nullptr) {
+        return error_dict(map_node.at("id").as_int());
+    } else {
+        const std::set<Bus*, bus_compare>& buses = t_c.stopname_to_buses(map_node.at("name").as_string());
+        std::vector<json::Node> buses_name;
+        for(const auto bus : buses) {
+            buses_name.push_back(json::Node(bus->name_));
+        }
+
+        json::Dict good_req = {{"request_id", json::Node(map_node.at("id").as_int())},
+            {"buses", json::Node(buses_name)}
+        };
+        return good_req;
+    }
+}
+
+
+
+/*std::vector<json::Node> json_reader::JSONReader::json_stat_from_tc(json::Node& map_node, TransportCatalogue& t_c, std::vector<json::Node>& answer, MapRenderer& m_r) {
+   if(map_node.at("type").as_string() == "Bus") {
+            if(t_c.pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
                 result.push_back(error_dict(map_node.at("id").as_int()));
             } else {
                 const auto a = map_node.at("name").as_string();
@@ -172,7 +173,7 @@ std::vector<json::Node> json_reader::JSONReader::json_stat_from_tc(std::vector<j
                     {"unique_stop_count", b_i.unique_stop_count_}
                 };
 
-                result.push_back(good_req);
+                answer.push_back(good_req);
             }
         } else if(map_node.at("type").as_string() == "Map") {
             svg::Document svg_doc;
