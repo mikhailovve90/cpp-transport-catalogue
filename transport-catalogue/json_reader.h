@@ -15,6 +15,8 @@ public:
     JSONReader& parse_render_settings(RenderSettings& r_s);
     //std::vector<json::Node> json_stat_from_tc(std::vector<json::Node>& stat_requests, TransportCatalogue& t_c, RenderSettings& r_s);
     json::Node stop_req_processing(const std::map<std::string, json::Node>& map_node, const TransportCatalogue& t_c) const;
+    json::Node bus_req_processing(const std::map<std::string, json::Node>& map_node, const BusInfo& b_i) const;
+    json::Node svg_req_processing(const std::map<std::string, json::Node>& map_node, const std::string& svg_str) const;
     json::Dict error_dict(int id) const;
     std::string& svg_to_json_format(std::string& text);
     void set_color_pallete(const std::vector<json::Node>& c_p_array, RenderSettings& r_s);

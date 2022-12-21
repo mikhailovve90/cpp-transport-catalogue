@@ -29,17 +29,17 @@ struct Stop
 struct Bus
 {
     Bus() {};
-    Bus(const std::string& n, std::vector<Stop*>& r, bool ring):route_(r),its_ring_(ring)
+    Bus(const std::string& n, std::vector<Stop*>& r, bool ring):route_(r),is_ring_(ring)
     {
         name_ = std::move(n);
     }
 
     size_t route_size();
-    bool its_ring();
+    bool is_ring();
 
     std::string name_;
     std::vector<Stop*> route_;
-    bool its_ring_;
+    bool is_ring_;
 };
 
 struct BusInfo{

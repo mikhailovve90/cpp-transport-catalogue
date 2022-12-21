@@ -23,7 +23,7 @@ void MapRenderer::render_route_line() {
         bus_route.SetStrokeWidth(render_settings.line_width);
         bus_route.SetFillColor(svg::NoneColor);
 
-        if(!bus->its_ring()) {
+        if(!bus->is_ring()) {
             size_t t = 0;
             for(; t < bus->route_.size(); ++t) {
                 svg::Point point = proj({bus->route_[t]->latitude, bus->route_[t]->longitude});
@@ -85,7 +85,7 @@ void MapRenderer::render_bus_name() {
         svg_doc.Add(bus_name_backg);
         svg_doc.Add(bus_name);
 
-        if(!bus->its_ring() && bus->route_[0] != bus->route_[bus->route_.size()-1]) {
+        if(!bus->is_ring() && bus->route_[0] != bus->route_[bus->route_.size()-1]) {
             bus_name.SetPosition(proj({bus->route_[bus->route_.size()-1]->latitude, bus->route_[bus->route_.size()-1]->longitude}));
             bus_name_backg.SetPosition(proj({bus->route_[bus->route_.size()-1]->latitude, bus->route_[bus->route_.size()-1]->longitude}));
             svg_doc.Add(bus_name_backg);

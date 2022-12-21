@@ -22,7 +22,7 @@ public:
     const TransportCatalogue& get_transport_catalogue() {return t_c_;}
     const MapRenderer& get_map_renderer() {return m_r_;}
     void render_map(std::ostream& out);
-    std::vector<json::Node> processing_requests();
+    std::vector<json::Node> process_requests();
 
 private:
    const TransportCatalogue& t_c_;
@@ -31,4 +31,4 @@ private:
    std::vector<json::Node> answer_;
 };
 
-//void processing_requests(RequestHandler& r_h ,std::ostream& out, JSONReader& j_p);
+//void process_requests(RequestHandler& r_h ,std::ostream& out, JSONReader& j_p);

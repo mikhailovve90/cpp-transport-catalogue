@@ -74,7 +74,7 @@ bool TransportCatalogue::exists_distance(std::string_view name1, std::string_vie
 
 long TransportCatalogue::calculate_distance(Bus* bus) const{
     long result = 0;
-    if(bus->its_ring()) {
+    if(bus->is_ring()) {
         for(size_t i = 0; i < bus->route_.size() - 1; ++i) {
             result += exists_distance(bus->route_.at(i)->name, bus->route_.at(i + 1)->name) ?
             get_distance_between_stops(bus->route_.at(i)->name, bus->route_.at(i + 1)->name) : get_distance_between_stops(bus->route_.at(i)->name, bus->route_.at(i)->name);
