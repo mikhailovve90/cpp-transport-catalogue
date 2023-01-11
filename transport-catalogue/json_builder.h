@@ -14,56 +14,27 @@ class Builder {
     class ItemContext {
       public:
         ItemContext(Builder& builder) : builder_(builder) {}
-
-        KeyItemContext Key(std::string str) {
-            return builder_.Key(std::move(str));
-        }
-
-        Builder& Value(json::Node node) {
-            builder_.Value(std::move(node));
-            return builder_;
-        }
-
-        DictItemContext StartDict() {
-            return builder_.StartDict();
-        }
-
-        ArrayItemContext StartArray() {
-            return builder_.StartArray();
-        }
-
-        Builder& EndDict() {
-            return builder_.EndDict();
-        }
-
-        Builder& EndArray() {
-            return builder_.EndArray();
-        }
-
+        KeyItemContext Key(std::string str);
+        Builder& Value(json::Node node);
+        DictItemContext StartDict();
+        ArrayItemContext StartArray();
+        Builder& EndDict();
+        Builder& EndArray();
         Builder& builder_;
     };
-
 
     class KeyItemContext : public ItemContext {
       public:
         KeyItemContext(Builder& builder) : ItemContext(builder) {}
-
         KeyItemContext Key(std::string str) = delete;
-
-        DictItemContext Value(json::Node node) {
-            builder_.Value(std::move(node));
-            return builder_;
-        }
-
+        DictItemContext Value(json::Node node);
         Builder& EndDict() = delete;
-
         Builder& EndArray() = delete;
     };
 
     class DictItemContext : public ItemContext {
       public:
         DictItemContext(Builder& builder) : ItemContext(builder) {}
-
         ItemContext Value(json::Node node) = delete;
         ItemContext StartDict() = delete;
         ItemContext StartArray() = delete;
@@ -75,18 +46,13 @@ class Builder {
         ArrayItemContext(Builder& builder) : ItemContext(builder) {}
         KeyItemContext Key(std::string str) = delete;
         Builder& EndDict() = delete;
-
-        ArrayItemContext Value(json::Node node) {
-            builder_.Value(std::move(node));
-            return builder_;
-        }
+        ArrayItemContext Value(json::Node node);
     };
 
 
 
     KeyItemContext Key(std::string str);
     Builder& Value(json::Node node);
-    //Builder& StartDict();
     DictItemContext StartDict();
     ArrayItemContext StartArray();
     Builder& EndDict();

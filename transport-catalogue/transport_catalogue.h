@@ -27,6 +27,7 @@ class TransportCatalogue {
     bool exists_distance(std::string_view name1, std::string_view name2) const;
     long calculate_distance(Bus* bus) const;
     const std::set<Bus*, bus_compare>& all_buses() const;
+    std::set<Stop*, stop_compare> stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses) const;
 
   private:
     std::deque<Stop> stops_;//контейнер существующих остановок

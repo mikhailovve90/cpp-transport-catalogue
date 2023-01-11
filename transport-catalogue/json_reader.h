@@ -9,7 +9,7 @@
 namespace json_reader {
 class JSONReader {
 public:
-    JSONReader(std::istream& input_stream) : doc_being_proc(read_json(input_stream)) {}
+    JSONReader(std::istream& input_stream) : doc_being_processed(read_json(input_stream)) {}
     json::Document read_json(std::istream& input_stream);
     JSONReader& parse_transport_catalogue(TransportCatalogue& t_c);
     JSONReader& parse_render_settings(RenderSettings& r_s);
@@ -21,9 +21,9 @@ public:
     std::string& svg_to_json_format(std::string& text);
     void set_color_pallete(const std::vector<json::Node>& c_p_array, RenderSettings& r_s);
     svg::Color set_rgb_rgba_color(const std::vector<json::Node>& c_array);
-    json::Document& get_doc() {return doc_being_proc;}
+    json::Document& get_doc() {return doc_being_processed;}
 private:
-    json::Document doc_being_proc;
+    json::Document doc_being_processed;
     const std::string err_msg = "not found";
 
 };

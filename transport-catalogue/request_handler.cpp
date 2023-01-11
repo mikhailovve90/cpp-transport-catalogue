@@ -19,7 +19,7 @@ BusInfo RequestHandler::get_bus_info(Bus* bus) {
     size_t uniq_stops_count;
     std::sort(copy_route.begin(), copy_route.end(),
     [](const Stop* a,const Stop* b) {
-        return std::lexicographical_compare(a->name.begin(), a->name.end(), b->name.begin(), b->name.end());
+        return std::lexicographical_compare(a->name_.begin(), a->name_.end(), b->name_.begin(), b->name_.end());
     });
     uniq_stops_count = distance(copy_route.begin(),std::unique(copy_route.begin(),copy_route.end()));
 

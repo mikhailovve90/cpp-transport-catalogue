@@ -52,7 +52,7 @@ json::Builder::ArrayItemContext json::Builder::StartArray() {
         nodes_stack_.push_back(str_arr);
         return {*this};
     }
-    throw std::logic_error("Only build may be call after comlete object");
+    throw std::logic_error("Only build may be call after complete object");
 }
 
 json::Builder& json::Builder::EndDict() {
@@ -77,7 +77,7 @@ json::Builder& json::Builder::EndDict() {
             }
         } else throw std::logic_error("EndDict call only for Dict(std::map<std::string, Node>)");
     }
-    throw std::logic_error("Only build may be call after comlete object");
+    throw std::logic_error("Only build may be call after complete object");
 }
 
 json::Builder& json::Builder::EndArray() {
@@ -104,5 +104,42 @@ json::Builder& json::Builder::EndArray() {
             }
         } else throw std::logic_error("EndArray call only for Array(std::vector<Node>)");
     }
-    throw std::logic_error("Only build may be call after comlete object");
+    throw std::logic_error("Only build may be call after complete object");
+}
+
+
+
+json::Builder::KeyItemContext json::Builder::ItemContext::Key(std::string str) {
+    return builder_.Key(std::move(str));
+}
+
+json::Builder& json::Builder::ItemContext::Value(json::Node node) {
+    builder_.Value(std::move(node));
+    return builder_;
+}
+
+json::Builder::DictItemContext json::Builder::ItemContext::StartDict() {
+    return builder_.StartDict();
+}
+
+json::Builder::ArrayItemContext json::Builder::ItemContext::StartArray() {
+    return builder_.StartArray();
+}
+
+json::Builder& json::Builder::ItemContext::EndDict() {
+    return builder_.EndDict();
+}
+
+json::Builder& json::Builder::ItemContext::EndArray() {
+    return builder_.EndArray();
+}
+
+json::Builder::DictItemContext json::Builder::KeyItemContext::Value(json::Node node) {
+        builder_.Value(std::move(node));
+        return builder_;
+}
+
+json::Builder::ArrayItemContext json::Builder::ArrayItemContext::Value(json::Node node) {
+    builder_.Value(std::move(node));
+    return builder_;
 }

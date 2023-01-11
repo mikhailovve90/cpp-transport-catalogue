@@ -5,7 +5,7 @@
 void TransportCatalogue::add_stop(const std::string& name, double lat, double lon) {
     Stop add_stop(name, lat, lon);
     stops_.push_back(add_stop);
-    stopname_to_stop_[stops_.back().name] = &stops_.back();
+    stopname_to_stop_[stops_.back().name_] = &stops_.back();
 }
 
 void TransportCatalogue::add_distance_to_stop(std::string_view name1, std::string_view name2, long dist) {
@@ -47,7 +47,7 @@ void TransportCatalogue::add_bus(const std::string& name, std::vector<Stop*>& st
     all_buses_.insert(&buses_.back());
     for(size_t t = 0; t < stops.size(); ++t) {
         {
-            stopname_to_buses_[stopname_to_stop_.at(stops[t]->name)->name].insert(&buses_.back());//.push_back(&buses_.back());
+            stopname_to_buses_[stopname_to_stop_.at(stops[t]->name_)->name_].insert(&buses_.back());//.push_back(&buses_.back());
         }
     }
 }
@@ -76,20 +76,30 @@ long TransportCatalogue::calculate_distance(Bus* bus) const{
     long result = 0;
     if(bus->is_ring()) {
         for(size_t i = 0; i < bus->route_.size() - 1; ++i) {
-            result += exists_distance(bus->route_.at(i)->name, bus->route_.at(i + 1)->name) ?
-            get_distance_between_stops(bus->route_.at(i)->name, bus->route_.at(i + 1)->name) : get_distance_between_stops(bus->route_.at(i+1)->name, bus->route_.at(i)->name);
+            result += exists_distance(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) ?
+            get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) : get_distance_between_stops(bus->route_.at(i+1)->name_, bus->route_.at(i)->name_);
         }
-        result += exists_distance(bus->route_.at(0)->name, bus->route_.at(bus->route_.size() - 1)->name) ?
-                  get_distance_between_stops(bus->route_.at(0)->name, bus->route_.at(bus->route_.size() - 1)->name)
-                  : get_distance_between_stops(bus->route_.at(bus->route_.size() - 1)->name, bus->route_.at(0)->name);
-        result += get_distance_between_stops(bus->route_.at(0)->name, bus->route_.at(0)->name);
+        result += exists_distance(bus->route_.at(0)->name_, bus->route_.at(bus->route_.size() - 1)->name_) ?
+                  get_distance_between_stops(bus->route_.at(0)->name_, bus->route_.at(bus->route_.size() - 1)->name_)
+                  : get_distance_between_stops(bus->route_.at(bus->route_.size() - 1)->name_, bus->route_.at(0)->name_);
+        result += get_distance_between_stops(bus->route_.at(0)->name_, bus->route_.at(0)->name_);
     } else {
         for(size_t i = 0; i < bus->route_.size() - 1; ++i) {
-            result += exists_distance(bus->route_.at(i)->name, bus->route_.at(i + 1)->name) ?
-            get_distance_between_stops(bus->route_.at(i)->name, bus->route_.at(i + 1)->name) : get_distance_between_stops(bus->route_.at(i + 1)->name, bus->route_.at(i)->name);
-            result += exists_distance(bus->route_.at(i + 1)->name, bus->route_.at(i)->name) ? get_distance_between_stops(bus->route_.at(i + 1)->name, bus->route_.at(i)->name) :
-            get_distance_between_stops(bus->route_.at(i)->name, bus->route_.at(i+ 1)->name);
+            result += exists_distance(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) ?
+            get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) : get_distance_between_stops(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_);
+            result += exists_distance(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_) ? get_distance_between_stops(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_) :
+            get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i+ 1)->name_);
         }
     }
     return result;
+}
+
+std::set<Stop*, stop_compare> TransportCatalogue::stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses) const {
+    std::set<Stop*, stop_compare> stops_in_alphabetical_;
+    for(const auto bus : buses) {
+        for(const auto stop : bus->route_) {
+            stops_in_alphabetical_.insert(stop);
+        }
+    }
+    return stops_in_alphabetical_;
 }

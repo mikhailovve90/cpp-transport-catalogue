@@ -17,11 +17,8 @@
 struct Stop
 {
     Stop() {};
-    Stop(const std::string& n, double lat, double lon):latitude(lat), longitude(lon)
-    {
-        name = std::move(n);
-    }
-    std::string name;
+    Stop(const std::string& name, double lat, double lon): name_(name), latitude(lat), longitude(lon){}
+    std::string name_;
     double latitude;
     double longitude;
 };
@@ -29,10 +26,7 @@ struct Stop
 struct Bus
 {
     Bus() {};
-    Bus(const std::string& n, std::vector<Stop*>& r, bool ring):route_(r),is_ring_(ring)
-    {
-        name_ = std::move(n);
-    }
+    Bus(const std::string& name, const std::vector<Stop*>& stops, bool ring): name_(name), route_(stops),is_ring_(ring){}
 
     size_t route_size();
     bool is_ring();
@@ -43,7 +37,8 @@ struct Bus
 };
 
 struct BusInfo{
-    BusInfo(double c, long r, size_t s, size_t u) : curvature_(c),route_length_(r), stop_count_(s), unique_stop_count_(u){};
+    BusInfo(double curvature, long route_length, size_t stop_count, size_t unique_stop_count) :
+    curvature_(curvature),route_length_(route_length), stop_count_(stop_count), unique_stop_count_(unique_stop_count){};
     double curvature_;
     int route_length_;
     int stop_count_;
@@ -71,8 +66,8 @@ struct stop_compare
 {
     bool operator() (const Stop* lhs, const Stop* rhs) const
     {
-        return lhs->name < rhs->name;
+        return lhs->name_ < rhs->name_;
     }
 };
 
-std::set<Stop*, stop_compare> stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses);
+//std::set<Stop*, stop_compare> stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses);

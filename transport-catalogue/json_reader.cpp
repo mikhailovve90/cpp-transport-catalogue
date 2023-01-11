@@ -6,7 +6,7 @@ json::Document json_reader::JSONReader::read_json(std::istream& input_stream) {
 }
 
 json_reader::JSONReader& json_reader::JSONReader::parse_transport_catalogue(TransportCatalogue& t_c) {
-    std::vector<json::Node> base_req = doc_being_proc.get_root().as_map().at("base_requests").as_array();
+    std::vector<json::Node> base_req = doc_being_processed.get_root().as_map().at("base_requests").as_array();
     std::unordered_map<std::string, std::deque<std::pair<std::string, int>>> dist_map;
 
     for(const json::Node& n_d : base_req) {
@@ -74,7 +74,7 @@ void json_reader::JSONReader::set_color_pallete(const std::vector<json::Node>& c
 
 
 json_reader::JSONReader& json_reader::JSONReader::parse_render_settings(RenderSettings& r_s) {
-    json::Dict ren_set = doc_being_proc.get_root().as_map().at("render_settings").as_map();
+    json::Dict ren_set = doc_being_processed.get_root().as_map().at("render_settings").as_map();
     r_s.width = ren_set["width"].as_double();
     r_s.height = ren_set["height"].as_double();
 

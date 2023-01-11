@@ -348,4 +348,110 @@ void Print(const Document& doc, std::ostream& output) {
     PrintNode(doc.get_root(), PrintContext{output});
 }
 
+
+bool Node::is_int() const {
+    return std::holds_alternative<int>(*this);
+}
+int Node::as_int() const {
+    using namespace std::literals;
+    if (!is_int()) {
+        throw std::logic_error("Not an int"s);
+    }
+    return std::get<int>(*this);
+}
+
+bool Node::is_pure_double() const {
+    return std::holds_alternative<double>(*this);
+}
+bool Node::is_double() const {
+    return is_int() || is_pure_double();
+}
+double Node::as_double() const {
+    using namespace std::literals;
+    if (!is_double()) {
+        throw std::logic_error("Not a double"s);
+    }
+    return is_pure_double() ? std::get<double>(*this) : as_int();
+}
+
+bool Node::is_bool() const {
+    return std::holds_alternative<bool>(*this);
+}
+bool Node::as_bool() const {
+    using namespace std::literals;
+    if (!is_bool()) {
+        throw std::logic_error("Not a bool"s);
+    }
+
+    return std::get<bool>(*this);
+}
+
+bool Node::is_null() const {
+    return std::holds_alternative<std::nullptr_t>(*this);
+}
+
+bool Node::is_array() const {
+    return std::holds_alternative<Array>(*this);
+}
+
+
+const Array& Node::as_array() const {
+    using namespace std::literals;
+    if (!is_array()) {
+        throw std::logic_error("Not an array"s);
+    }
+
+    return std::get<Array>(*this);
+}
+
+Array& Node::as_array() {
+    using namespace std::literals;
+    if (!is_array()) {
+        throw std::logic_error("Not an array"s);
+    }
+
+    return std::get<Array>(*this);
+}
+
+bool Node::is_string() const {
+    return std::holds_alternative<std::string>(*this);
+}
+const std::string& Node::as_string() const {
+    using namespace std::literals;
+    if (!is_string()) {
+        throw std::logic_error("Not a string"s);
+    }
+
+    return std::get<std::string>(*this);
+}
+
+bool Node::is_map() const {
+    return std::holds_alternative<Dict>(*this);
+}
+const Dict& Node::as_map() const {
+    using namespace std::literals;
+    if (!is_map()) {
+        throw std::logic_error("Not a dict"s);
+    }
+
+    return std::get<Dict>(*this);
+}
+
+Dict& Node::as_map() {
+    using namespace std::literals;
+    if (!is_map()) {
+        throw std::logic_error("Not a dict"s);
+    }
+    return std::get<Dict>(*this);
+}
+
+const Node::Value& Node::get_value() const {
+    return *this;
+}
+
+const Node& Document::get_root() const {
+    return root_;
+}
+
+
 }  // namespace json

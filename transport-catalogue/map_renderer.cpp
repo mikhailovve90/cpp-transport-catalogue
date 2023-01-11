@@ -97,7 +97,7 @@ void MapRenderer::render_bus_name() {
 
 
 void MapRenderer::render_stop_circle() {
-    std::set<Stop*, stop_compare> stops_in_alphabetical_ = stops_in_alphabetical(buses_);
+    std::set<Stop*, stop_compare> stops_in_alphabetical_ = t_c_.stops_in_alphabetical(buses_);
     svg::Color white_color("white");
     double rad = render_settings.stop_radius;
 
@@ -111,7 +111,7 @@ void MapRenderer::render_stop_circle() {
 }
 
 void MapRenderer::stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point p) {
-    t.SetData(stop->name);
+    t.SetData(stop->name_);
     t.SetPosition(p);
     t.SetOffset(svg::Point(render_settings.stop_label_offset[0], render_settings.stop_label_offset[1]));
     t.SetFontSize(render_settings.stop_label_font_size);
@@ -119,7 +119,7 @@ void MapRenderer::stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point
 }
 
 void MapRenderer::render_stop_name(){
-    std::set<Stop*, stop_compare> stops_in_alphabetical_ = stops_in_alphabetical(buses_);
+    std::set<Stop*, stop_compare> stops_in_alphabetical_ = t_c_.stops_in_alphabetical(buses_);
     svg::Color black_color("black");
 
     for(Stop* stop : stops_in_alphabetical_) {

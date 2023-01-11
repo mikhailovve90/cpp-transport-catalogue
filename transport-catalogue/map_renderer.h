@@ -110,7 +110,8 @@ class SphereProjector {
 
 class MapRenderer {
 public:
-    MapRenderer(const TransportCatalogue& t_c, const RenderSettings& rs):buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
+    MapRenderer(const TransportCatalogue& t_c, const RenderSettings& rs):
+    t_c_(t_c), buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
     void render_route_line();
     void render_bus_name();
     void render_stop_circle();
@@ -121,6 +122,7 @@ public:
     void stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point p);
     SphereProjector render_coordinates();
 private:
+    const TransportCatalogue& t_c_;
     svg::Document svg_doc;
     const std::set<Bus*, bus_compare>& buses_;
     const RenderSettings& render_settings;
