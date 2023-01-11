@@ -1,9 +1,6 @@
 #include "json_reader.h"
 
-/*
- * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
- * а также код обработки запросов к базе и формирование массива ответов в формате JSON
- */
+
 json::Document json_reader::JSONReader::read_json(std::istream& input_stream) {
     return json::Load(input_stream);
 }

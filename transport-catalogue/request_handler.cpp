@@ -66,4 +66,20 @@ std::vector<json::Node> RequestHandler::process_requests() {
     return answer_;
 }
 
+json::Node& RequestHandler::building_node() {
+    json::Builder builder;
+    builder.StartArray();
+    for(auto node : answer_) {
+        if(node.is_map()) {
+            builder.StartDict();
+            for(auto [key , value] : node.as_map()) {
+                builder.Key(key).Value(value);
+            }
+            builder.EndDict();
+        }
+    }
 
+    builder.EndArray();
+    build_node_ = builder.Build();
+    return build_node_;
+}

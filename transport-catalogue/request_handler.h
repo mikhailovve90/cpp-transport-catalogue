@@ -12,6 +12,7 @@
 #include "map_renderer.h"
 #include "json.h"
 #include "json_reader.h"
+#include "json_builder.h"
 
 
 class RequestHandler {
@@ -23,12 +24,14 @@ public:
     const MapRenderer& get_map_renderer() {return m_r_;}
     void render_map(std::ostream& out);
     std::vector<json::Node> process_requests();
+    json::Node& building_node();
 
 private:
    const TransportCatalogue& t_c_;
    MapRenderer& m_r_;
    json_reader::JSONReader& doc_;
    std::vector<json::Node> answer_;
+   json::Node build_node_;
 };
 
 //void process_requests(RequestHandler& r_h ,std::ostream& out, JSONReader& j_p);
