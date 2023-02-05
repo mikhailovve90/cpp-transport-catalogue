@@ -23,7 +23,7 @@ void MapRenderer::render_route_line() {
         bus_route.SetStrokeWidth(render_settings.line_width);
         bus_route.SetFillColor(svg::NoneColor);
 
-        if(!bus->is_ring()) {
+        if(!bus-> is_circular_route()) {
             size_t t = 0;
             for(; t < bus->route_.size(); ++t) {
                 svg::Point point = proj({bus->route_[t]->latitude, bus->route_[t]->longitude});
@@ -85,7 +85,7 @@ void MapRenderer::render_bus_name() {
         svg_doc.Add(bus_name_backg);
         svg_doc.Add(bus_name);
 
-        if(!bus->is_ring() && bus->route_[0] != bus->route_[bus->route_.size()-1]) {
+        if(!bus-> is_circular_route() && bus->route_[0] != bus->route_[bus->route_.size()-1]) {
             bus_name.SetPosition(proj({bus->route_[bus->route_.size()-1]->latitude, bus->route_[bus->route_.size()-1]->longitude}));
             bus_name_backg.SetPosition(proj({bus->route_[bus->route_.size()-1]->latitude, bus->route_[bus->route_.size()-1]->longitude}));
             svg_doc.Add(bus_name_backg);
@@ -97,7 +97,7 @@ void MapRenderer::render_bus_name() {
 
 
 void MapRenderer::render_stop_circle() {
-    std::set<Stop*, stop_compare> stops_in_alphabetical_ = t_c_.stops_in_alphabetical(buses_);
+    std::set<Stop*, stop_compare> stops_in_alphabetical_ = transport_catalogue_.stops_in_alphabetical(buses_);
     svg::Color white_color("white");
     double rad = render_settings.stop_radius;
 
@@ -119,7 +119,7 @@ void MapRenderer::stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point
 }
 
 void MapRenderer::render_stop_name() {
-    std::set<Stop*, stop_compare> stops_in_alphabetical_ = t_c_.stops_in_alphabetical(buses_);
+    std::set<Stop*, stop_compare> stops_in_alphabetical_ = transport_catalogue_.stops_in_alphabetical(buses_);
     svg::Color black_color("black");
 
     for(Stop* stop : stops_in_alphabetical_) {

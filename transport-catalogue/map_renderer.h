@@ -98,7 +98,6 @@ class SphereProjector {
             (max_lat_ - coords.lat) * zoom_coeff_ + padding_
         };
     }
-
   private:
     double padding_;
     double min_lon_ = 0;
@@ -106,12 +105,10 @@ class SphereProjector {
     double zoom_coeff_ = 0;
 };
 
-
-
 class MapRenderer {
   public:
     MapRenderer(const TransportCatalogue& t_c, const RenderSettings& rs):
-        t_c_(t_c), buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
+        transport_catalogue_(t_c), buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
     void render_route_line();
     void render_bus_name();
     void render_stop_circle();
@@ -124,19 +121,9 @@ class MapRenderer {
     void stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point p);
     SphereProjector render_coordinates();
   private:
-    const TransportCatalogue& t_c_;
+    const TransportCatalogue& transport_catalogue_;
     svg::Document svg_doc;
     const std::set<Bus*, bus_compare>& buses_;
     const RenderSettings& render_settings;
     SphereProjector proj;
 };
-
-
-
-/*svg::Document& render_route_line(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
-svg::Document& render_bus_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
-svg::Document& renderender_settingstop_circle(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
-svg::Document& renderender_settingstop_name(const std::set<Bus*, bus_compare>& buses, const SphereProjector& proj, RenderSettings& render_settings, svg::Document& svg_doc);
-
-void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_c);
-void stopname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p, RenderSettings& r_c);*/

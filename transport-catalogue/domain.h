@@ -27,14 +27,14 @@ struct Stop {
 
 struct Bus {
     Bus() {};
-    Bus(const std::string& name, const std::vector<Stop*>& stops, bool ring): name_(name), route_(stops),is_ring_(ring) {}
+    Bus(const std::string& name, const std::vector<Stop*>& stops, bool ring): name_(name), route_(stops), is_circular_route_(ring) {}
 
     size_t route_size() const;
-    bool is_ring() const;
+    bool  is_circular_route() const;
 
     std::string name_;
     std::vector<Stop*> route_;
-    bool is_ring_;
+    bool  is_circular_route_;
 };
 
 struct BusInfo {
@@ -66,5 +66,3 @@ struct stop_compare {
         return lhs->name_ < rhs->name_;
     }
 };
-
-//std::set<Stop*, stop_compare> stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses);

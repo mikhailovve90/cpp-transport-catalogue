@@ -6,11 +6,12 @@ class TransportRouter {
     void initialize_graph(const std::deque<Stop>& all_stops);
     void initialize_router();
     void add_bus_route_to_graph(const Bus* bus, const TransportCatalogue& t_c);
-    void add_edges_buses_route_to_graf(const TransportCatalogue& t_c);
+    void add_edges_buses_route_to_graph(const TransportCatalogue& t_c);
     void set_wait_time(int wait_time);
     void set_bus_speed(int bus_speed);
     const std::optional<graph::Router<double>::RouteInfo> get_route(const Stop* from, const Stop* to) const;
-
+    void add_circular_route_to_graph(const Bus* bus, const TransportCatalogue& t_c, const size_t route_size);
+    void add_linear_route_to_graph(const Bus* bus, const TransportCatalogue& t_c, const size_t route_size);
     const graph::Edge<double>& get_edge(graph::EdgeId edge_id) const {
         return bus_route_graph_->GetEdge(edge_id);
     }

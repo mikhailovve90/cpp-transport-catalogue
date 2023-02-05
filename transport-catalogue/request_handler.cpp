@@ -3,17 +3,17 @@
 
 
 BusInfo RequestHandler::get_bus_info(Bus* bus) {
-    long bus_route_lenght = t_c_.calculate_distance(bus);
+    long bus_route_lenght = transport_catalogue_.calculate_distance(bus);
 
     double bus_route_lenght_geo = 0;
     for(size_t t = 0; t < bus->route_.size() - 1 ; ++t) {
         bus_route_lenght_geo += geo::compute_distance({bus->route_[t]->latitude, bus->route_[t]->longitude}, {bus->route_[t+1]->latitude, bus->route_[t+1]->longitude});
     }
-    if(!bus->is_ring()) {
+    if(!bus-> is_circular_route()) {
         bus_route_lenght_geo *= 2;
     }
 
-    size_t route_size = bus->is_ring()?bus->route_size()-1:bus->route_size()*2 - 1;
+    size_t route_size = bus-> is_circular_route()?bus->route_size()-1:bus->route_size()*2 - 1;
 
     auto copy_route = bus->route_;
     size_t uniq_stops_count;
@@ -30,11 +30,11 @@ BusInfo RequestHandler::get_bus_info(Bus* bus) {
 
 
 void RequestHandler::render_map(std::ostream& out) {
-    m_r_.render_route_line();
-    m_r_.render_bus_name();
-    m_r_.render_stop_circle();
-    m_r_.render_stop_name();
-    m_r_.get_svg_doc().Render(out);
+    map_renderer_.render_route_line();
+    map_renderer_.render_bus_name();
+    map_renderer_.render_stop_circle();
+    map_renderer_.render_stop_name();
+    map_renderer_.get_svg_doc().Render(out);
 }
 
 std::vector<json::Node> RequestHandler::process_requests() {
@@ -45,13 +45,13 @@ std::vector<json::Node> RequestHandler::process_requests() {
     for(const json::Node& n_d : requests) {
         const std::map<std::string, json::Node>& map_node = n_d.as_map();
         if(map_node.at("type").as_string() == "Stop") {
-            answer_.push_back(doc_.stop_req_processing(map_node, t_c_));
+            answer_.push_back(doc_.stop_req_processing(map_node, transport_catalogue_));
         } else if(map_node.at("type").as_string() == "Bus") {
-            if(t_c_.pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
+            if(transport_catalogue_.pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
                 answer_.push_back(doc_.error_dict(map_node.at("id").as_int()));
             } else {
                 const auto a = map_node.at("name").as_string();
-                BusInfo b_i = this->get_bus_info(t_c_.pointer_bus_name(map_node.at("name").as_string()));
+                BusInfo b_i = this->get_bus_info(transport_catalogue_.pointer_bus_name(map_node.at("name").as_string()));
                 answer_.push_back(doc_.bus_req_processing(map_node, b_i));
             }
         } else if(map_node.at("type").as_string() == "Map") {
@@ -62,14 +62,14 @@ std::vector<json::Node> RequestHandler::process_requests() {
             doc_.svg_to_json_format(svg_str);
             answer_.push_back(doc_.svg_req_processing(map_node, svg_str));
         } else if((map_node.at("type").as_string() == "Route")) {
-            Stop* from = t_c_.pointer_stop_name(map_node.at("from").as_string());
-            Stop* to = t_c_.pointer_stop_name(map_node.at("to").as_string());;
-            std::optional<graph::Router<double>::RouteInfo> result = t_r_.get_route(from, to);
+            Stop* from = transport_catalogue_.pointer_stop_name(map_node.at("from").as_string());
+            Stop* to = transport_catalogue_.pointer_stop_name(map_node.at("to").as_string());;
+            std::optional<graph::Router<double>::RouteInfo> result = transport_route_.get_route(from, to);
 
             if(!result.has_value()) {
                 answer_.push_back(doc_.error_dict(map_node.at("id").as_int()));
             } else {
-                answer_.push_back(doc_.route_req_processing(map_node, t_r_, result));
+                answer_.push_back(doc_.route_req_processing(map_node, transport_route_, result));
             }
         }
     }

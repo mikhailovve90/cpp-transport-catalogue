@@ -17,31 +17,31 @@
 
 class RequestHandler {
   public:
-    RequestHandler(const TransportCatalogue& t_c, MapRenderer& m_r, json_reader::JSONReader& doc) : t_c_(t_c), m_r_(m_r), doc_(doc) {
-        doc_.parse_routing_settings(t_r_);
-        t_r_.initialize_graph(t_c_.get_stops());
-        t_r_.add_edges_buses_route_to_graf(t_c_);
-        t_r_.initialize_router();
+    RequestHandler(const TransportCatalogue& t_c, MapRenderer& m_r, json_reader::JSONReader& doc) : transport_catalogue_(t_c), map_renderer_(m_r), doc_(doc) {
+        doc_.parse_routing_settings(transport_route_);
+        transport_route_.initialize_graph(transport_catalogue_.get_stops());
+        transport_route_.add_edges_buses_route_to_graph(transport_catalogue_);
+        transport_route_.initialize_router();
     }
     BusInfo get_bus_info(Bus* bus);
 
-    const TransportCatalogue& get_transport_catalogue() {
-        return t_c_;
+    const TransportCatalogue& get_transport_catalogue_() {
+        return transport_catalogue_;
     }
     const MapRenderer& get_map_renderer() {
-        return m_r_;
+        return map_renderer_;
     }
     void render_map(std::ostream& out);
     std::vector<json::Node> process_requests();
     json::Node& building_node();
 
   private:
-    const TransportCatalogue& t_c_;
-    MapRenderer& m_r_;
+    const TransportCatalogue& transport_catalogue_;
+    MapRenderer& map_renderer_;
     json_reader::JSONReader& doc_;
     std::vector<json::Node> answer_;
     json::Node build_node_;
-    TransportRouter t_r_;
+    TransportRouter transport_route_;
 };
 
 //void process_requests(RequestHandler& r_h ,std::ostream& out, JSONReader& j_p);

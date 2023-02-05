@@ -16,16 +16,6 @@ size_t Bus::route_size() const {
     return route_.size();
 }
 
-bool Bus::is_ring() const {
-    return is_ring_;
+bool Bus:: is_circular_route() const {
+    return  is_circular_route_;
 }
-/*
-std::set<Stop*, stop_compare> stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses) {
-    std::set<Stop*, stop_compare> stops_in_alphabetical_;
-    for(const auto bus : buses) {
-        for(const auto stop : bus->route_) {
-            stops_in_alphabetical_.insert(stop);
-        }
-    }
-    return stops_in_alphabetical_;
-}*/
