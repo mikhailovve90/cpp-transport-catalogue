@@ -13,13 +13,13 @@ using Dict = std::map<std::string, Node>;
 using Array = std::vector<Node>;
 
 class ParsingError : public std::runtime_error {
-public:
+  public:
     using runtime_error::runtime_error;
 };
 
 class Node final
     : private std::variant<std::nullptr_t, Array, Dict, bool, int, double, std::string> {
-public:
+  public:
     using variant::variant;
     using Value = variant;
 
@@ -52,14 +52,14 @@ inline bool operator!=(const Node& lhs, const Node& rhs) {
 }
 
 class Document {
-public:
+  public:
     explicit Document(Node root)
         : root_(std::move(root)) {
     }
 
     const Node& get_root() const;
 
-private:
+  private:
     Node root_;
 };
 

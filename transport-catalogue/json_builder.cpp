@@ -135,8 +135,8 @@ json::Builder& json::Builder::ItemContext::EndArray() {
 }
 
 json::Builder::DictItemContext json::Builder::KeyItemContext::Value(json::Node node) {
-        builder_.Value(std::move(node));
-        return builder_;
+    builder_.Value(std::move(node));
+    return builder_;
 }
 
 json::Builder::ArrayItemContext json::Builder::ArrayItemContext::Value(json::Node node) {

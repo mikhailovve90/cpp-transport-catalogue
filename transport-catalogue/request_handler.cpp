@@ -30,11 +30,11 @@ BusInfo RequestHandler::get_bus_info(Bus* bus) {
 
 
 void RequestHandler::render_map(std::ostream& out) {
-     m_r_.render_route_line();
-     m_r_.render_bus_name();
-     m_r_.render_stop_circle();
-     m_r_.render_stop_name();
-     m_r_.get_svg_doc().Render(out);
+    m_r_.render_route_line();
+    m_r_.render_bus_name();
+    m_r_.render_stop_circle();
+    m_r_.render_stop_name();
+    m_r_.get_svg_doc().Render(out);
 }
 
 std::vector<json::Node> RequestHandler::process_requests() {
@@ -45,7 +45,7 @@ std::vector<json::Node> RequestHandler::process_requests() {
     for(const json::Node& n_d : requests) {
         const std::map<std::string, json::Node>& map_node = n_d.as_map();
         if(map_node.at("type").as_string() == "Stop") {
-              answer_.push_back(doc_.stop_req_processing(map_node, t_c_));
+            answer_.push_back(doc_.stop_req_processing(map_node, t_c_));
         } else if(map_node.at("type").as_string() == "Bus") {
             if(t_c_.pointer_bus_name(map_node.at("name").as_string()) == nullptr) {
                 answer_.push_back(doc_.error_dict(map_node.at("id").as_int()));
@@ -61,6 +61,16 @@ std::vector<json::Node> RequestHandler::process_requests() {
             std::string svg_str = out.str();
             doc_.svg_to_json_format(svg_str);
             answer_.push_back(doc_.svg_req_processing(map_node, svg_str));
+        } else if((map_node.at("type").as_string() == "Route")) {
+            Stop* from = t_c_.pointer_stop_name(map_node.at("from").as_string());
+            Stop* to = t_c_.pointer_stop_name(map_node.at("to").as_string());;
+            std::optional<graph::Router<double>::RouteInfo> result = t_r_.get_route(from, to);
+
+            if(!result.has_value()) {
+                answer_.push_back(doc_.error_dict(map_node.at("id").as_int()));
+            } else {
+                answer_.push_back(doc_.route_req_processing(map_node, t_r_, result));
+            }
         }
     }
     return answer_;
@@ -72,7 +82,7 @@ json::Node& RequestHandler::building_node() {
     for(auto node : answer_) {
         if(node.is_map()) {
             builder.StartDict();
-            for(auto [key , value] : node.as_map()) {
+            for(auto [key, value] : node.as_map()) {
                 builder.Key(key).Value(value);
             }
             builder.EndDict();

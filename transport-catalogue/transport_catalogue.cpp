@@ -1,9 +1,12 @@
 #include "transport_catalogue.h"
 
-#include "transport_catalogue.h"
 
 void TransportCatalogue::add_stop(const std::string& name, double lat, double lon) {
     Stop add_stop(name, lat, lon);
+    add_stop.start_vertex = vertex_counter_;
+    ++vertex_counter_;
+    add_stop.route_vertex = vertex_counter_;
+    ++vertex_counter_;
     stops_.push_back(add_stop);
     stopname_to_stop_[stops_.back().name_] = &stops_.back();
 }
@@ -13,15 +16,15 @@ void TransportCatalogue::add_distance_to_stop(std::string_view name1, std::strin
     stops_distance_[std::pair(pointer_stop_name(name1), pointer_stop_name(name2))] = dist;
 }
 
-std::deque<Stop>& TransportCatalogue::get_stops() {
+const std::deque<Stop>& TransportCatalogue::get_stops() const {
     return stops_;
 }
 
-std::deque<Bus>& TransportCatalogue::get_buses() {
+const std::deque<Bus>& TransportCatalogue::get_buses() const {
     return buses_;
 }
 
-Stop* TransportCatalogue::pointer_stop_name(std::string_view name) const{
+Stop* TransportCatalogue::pointer_stop_name(std::string_view name) const {
     if(stopname_to_stop_.count(name)) {
         return stopname_to_stop_.at(name);
     }
@@ -59,9 +62,18 @@ const std::set<Bus*, bus_compare>& TransportCatalogue::stopname_to_buses(const s
     return null_buses;
 }
 
-long TransportCatalogue::get_distance_between_stops(std::string_view name1, std::string_view name2) const{
+long TransportCatalogue::get_distance_between_stops(std::string_view name1, std::string_view name2) const {
     if(exists_distance(name1, name2)) {
         return stops_distance_.at(std::pair(pointer_stop_name(name1), pointer_stop_name(name2)));
+    }
+    return 0;
+}
+
+long TransportCatalogue::get_distance_between_stops_for_graph(std::string_view name1, std::string_view name2) const {
+    if(exists_distance(name1, name2)) {
+        return stops_distance_.at(std::pair(pointer_stop_name(name1), pointer_stop_name(name2)));
+    } else if(exists_distance(name2, name1)) {
+        return stops_distance_.at(std::pair(pointer_stop_name(name2), pointer_stop_name(name1)));
     }
     return 0;
 }
@@ -72,12 +84,12 @@ bool TransportCatalogue::exists_distance(std::string_view name1, std::string_vie
     return stops_distance_.count(std::pair(stop1, stop2));
 }
 
-long TransportCatalogue::calculate_distance(Bus* bus) const{
+long TransportCatalogue::calculate_distance(Bus* bus) const {
     long result = 0;
     if(bus->is_ring()) {
         for(size_t i = 0; i < bus->route_.size() - 1; ++i) {
             result += exists_distance(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) ?
-            get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) : get_distance_between_stops(bus->route_.at(i+1)->name_, bus->route_.at(i)->name_);
+                      get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) : get_distance_between_stops(bus->route_.at(i+1)->name_, bus->route_.at(i)->name_);
         }
         result += exists_distance(bus->route_.at(0)->name_, bus->route_.at(bus->route_.size() - 1)->name_) ?
                   get_distance_between_stops(bus->route_.at(0)->name_, bus->route_.at(bus->route_.size() - 1)->name_)
@@ -86,9 +98,9 @@ long TransportCatalogue::calculate_distance(Bus* bus) const{
     } else {
         for(size_t i = 0; i < bus->route_.size() - 1; ++i) {
             result += exists_distance(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) ?
-            get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) : get_distance_between_stops(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_);
+                      get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i + 1)->name_) : get_distance_between_stops(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_);
             result += exists_distance(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_) ? get_distance_between_stops(bus->route_.at(i + 1)->name_, bus->route_.at(i)->name_) :
-            get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i+ 1)->name_);
+                      get_distance_between_stops(bus->route_.at(i)->name_, bus->route_.at(i+ 1)->name_);
         }
     }
     return result;
@@ -103,3 +115,4 @@ std::set<Stop*, stop_compare> TransportCatalogue::stops_in_alphabetical(const st
     }
     return stops_in_alphabetical_;
 }
+

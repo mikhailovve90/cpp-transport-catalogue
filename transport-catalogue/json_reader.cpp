@@ -7,6 +7,7 @@ json::Document json_reader::JSONReader::read_json(std::istream& input_stream) {
 
 json_reader::JSONReader& json_reader::JSONReader::parse_transport_catalogue(TransportCatalogue& t_c) {
     std::vector<json::Node> base_req = doc_being_processed.get_root().as_map().at("base_requests").as_array();
+    //Для сбора информации о дистанциях и дальнейшем заполнении расстояний
     std::unordered_map<std::string, std::deque<std::pair<std::string, int>>> dist_map;
 
     for(const json::Node& n_d : base_req) {
@@ -48,13 +49,13 @@ json_reader::JSONReader& json_reader::JSONReader::parse_transport_catalogue(Tran
 svg::Color json_reader::JSONReader::set_rgb_rgba_color(const std::vector<json::Node>& c_array) {
     if(c_array.size() == 3) {
         return svg::Color(svg::Rgb(c_array[0].as_int(),
-                                              c_array[1].as_int(),
-                                              c_array[2].as_int()));
+                                   c_array[1].as_int(),
+                                   c_array[2].as_int()));
     } else if (c_array.size() == 4) {
         return svg::Color(svg::Rgba(c_array[0].as_int(),
-                                           c_array[1].as_int(),
-                                           c_array[2].as_int(),
-                                           c_array[3].as_double()));
+                                    c_array[1].as_int(),
+                                    c_array[2].as_int(),
+                                    c_array[3].as_double()));
     }
 
     return svg::NoneColor;
@@ -113,6 +114,15 @@ json_reader::JSONReader& json_reader::JSONReader::parse_render_settings(RenderSe
     return *this;
 }
 
+json_reader::JSONReader& json_reader::JSONReader::parse_routing_settings(TransportRouter& t_r) {
+    json::Dict route_set = doc_being_processed.get_root().as_map().at("routing_settings").as_map();
+    t_r.set_wait_time(route_set["bus_wait_time"].as_int());
+    t_r.set_bus_speed(route_set["bus_velocity"].as_int());
+    return *this;
+}
+
+
+
 
 json::Dict json_reader::JSONReader::error_dict(int id) const {
     return {{"request_id", id},
@@ -122,7 +132,7 @@ json::Dict json_reader::JSONReader::error_dict(int id) const {
 std::string& json_reader::JSONReader::svg_to_json_format(std::string& text) {
     std::deque<std::pair<char, std::string>> dictionary = {
         std::make_pair('\\', "\\"),
-        std::make_pair('"' , "\""),
+        std::make_pair('"', "\""),
         std::make_pair('\r', "\r"),
         std::make_pair('\n', "\n"),
     };
@@ -130,10 +140,10 @@ std::string& json_reader::JSONReader::svg_to_json_format(std::string& text) {
         auto pos = text.find(pair.first);
         while(pos != std::string::npos) {
             text.replace(pos, 1, pair.second);
-            pos = text.find(pair.first , pos + pair.second.size());
+            pos = text.find(pair.first, pos + pair.second.size());
         }
     }
-      return text;
+    return text;
 }
 
 json::Node json_reader::JSONReader::stop_req_processing(const std::map<std::string, json::Node>& map_node, const TransportCatalogue& t_c) const {
@@ -153,17 +163,46 @@ json::Node json_reader::JSONReader::stop_req_processing(const std::map<std::stri
     }
 }
 
+json::Node json_reader::JSONReader::route_req_processing(const std::map<std::string, json::Node>& map_node, const TransportRouter& t_r, std::optional<graph::Router<double>::RouteInfo> route_info) const {
+    std::vector<json::Node> result;
+    for(auto ed_route : route_info.value().edges) {
+        const graph::Edge edge = t_r.get_edge(ed_route);
+        const auto current_edge = t_r.get_edge_content_from_edge_id(ed_route);
+        json::Dict dict;
+        int size = current_edge.second.size();
+        if(size == 1) {
+            dict = {
+                {"type", "Wait"},
+                {"stop_name", current_edge.second[0]->name_},
+                {"time", edge.weight}
+            };
+        } else {
+            dict = {
+                {"type", "Bus"},
+                {"bus", current_edge.first->name_},
+                {"span_count", size - 1},
+                {"time", edge.weight}
+            };
+        }
+        result.push_back(dict);
+    }
+    json::Dict res = {{"items", result}, {"request_id", json::Node(map_node.at("id").as_int())}, {"total_time", route_info.value().weight}};
+    return res;
+}
+
+
 json::Node json_reader::JSONReader::bus_req_processing(const std::map<std::string, json::Node>& map_node, const BusInfo& b_i) const {
     json::Dict result = {{"request_id", json::Node(map_node.at("id").as_int())},
-    {"curvature", b_i.curvature_},
-    {"route_length", b_i.route_length_},
-    {"stop_count", b_i.stop_count_},
-    {"unique_stop_count", b_i.unique_stop_count_}};
+        {"curvature", b_i.curvature_},
+        {"route_length", b_i.route_length_},
+        {"stop_count", b_i.stop_count_},
+        {"unique_stop_count", b_i.unique_stop_count_}
+    };
     return result;
 }
 
 json::Node json_reader::JSONReader::svg_req_processing(const std::map<std::string, json::Node>& map_node, const std::string& svg_str) const {
-    json::Dict result = {{"request_id", json::Node(map_node.at("id").as_int())}, {"map" , json::Node(svg_str)}};
+    json::Dict result = {{"request_id", json::Node(map_node.at("id").as_int())}, {"map", json::Node(svg_str)}};
     return result;
 }
 

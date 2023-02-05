@@ -76,23 +76,23 @@ Node LoadString(std::istream& input) {
             }
             const char escaped_char = *(it);
             switch (escaped_char) {
-                case 'n':
-                    s.push_back('\n');
-                    break;
-                case 't':
-                    s.push_back('\t');
-                    break;
-                case 'r':
-                    s.push_back('\r');
-                    break;
-                case '"':
-                    s.push_back('"');
-                    break;
-                case '\\':
-                    s.push_back('\\');
-                    break;
-                default:
-                    throw ParsingError("Unrecognized escape sequence \\"s + escaped_char);
+            case 'n':
+                s.push_back('\n');
+                break;
+            case 't':
+                s.push_back('\t');
+                break;
+            case 'r':
+                s.push_back('\r');
+                break;
+            case '"':
+                s.push_back('"');
+                break;
+            case '\\':
+                s.push_back('\\');
+                break;
+            default:
+                throw ParsingError("Unrecognized escape sequence \\"s + escaped_char);
             }
         } else if (ch == '\n' || ch == '\r') {
             throw ParsingError("Unexpected end of line"s);
@@ -196,29 +196,29 @@ Node LoadNode(std::istream& input) {
         throw ParsingError("Unexpected EOF"s);
     }
     switch (c) {
-        case '[':
-            return LoadArray(input);
-        case '{':
-            return LoadDict(input);
-        case '"':
-            return LoadString(input);
-        case 't':
-            // Атрибут [[fallthrough]] (провалиться) ничего не делает, и является
-            // подсказкой компилятору и человеку, что здесь программист явно задумывал
-            // разрешить переход к инструкции следующей ветки case, а не случайно забыл
-            // написать break, return или throw.
-            // В данном случае, встретив t или f, переходим к попытке парсинга
-            // литералов true либо false
-            [[fallthrough]];
-        case 'f':
-            input.putback(c);
-            return LoadBool(input);
-        case 'n':
-            input.putback(c);
-            return LoadNull(input);
-        default:
-            input.putback(c);
-            return LoadNumber(input);
+    case '[':
+        return LoadArray(input);
+    case '{':
+        return LoadDict(input);
+    case '"':
+        return LoadString(input);
+    case 't':
+        // Атрибут [[fallthrough]] (провалиться) ничего не делает, и является
+        // подсказкой компилятору и человеку, что здесь программист явно задумывал
+        // разрешить переход к инструкции следующей ветки case, а не случайно забыл
+        // написать break, return или throw.
+        // В данном случае, встретив t или f, переходим к попытке парсинга
+        // литералов true либо false
+        [[fallthrough]];
+    case 'f':
+        input.putback(c);
+        return LoadBool(input);
+    case 'n':
+        input.putback(c);
+        return LoadNull(input);
+    default:
+        input.putback(c);
+        return LoadNumber(input);
     }
 }
 
@@ -249,21 +249,21 @@ void PrintString(const std::string& value, std::ostream& out) {
     out.put('"');
     for (const char c : value) {
         switch (c) {
-            case '\r':
-                out << "\\r"sv;
-                break;
-            case '\n':
-                out << "\\n"sv;
-                break;
-            case '"':
-                // Символы " и \ выводятся как \" или \\, соответственно
-                [[fallthrough]];
-            case '\\':
-                out.put('\\');
-                [[fallthrough]];
-            default:
-                out.put(c);
-                break;
+        case '\r':
+            out << "\\r"sv;
+            break;
+        case '\n':
+            out << "\\n"sv;
+            break;
+        case '"':
+            // Символы " и \ выводятся как \" или \\, соответственно
+            [[fallthrough]];
+        case '\\':
+            out.put('\\');
+            [[fallthrough]];
+        default:
+            out.put(c);
+            break;
         }
     }
     out.put('"');
@@ -332,10 +332,10 @@ void PrintValue<Dict>(const Dict& nodes, const PrintContext& ctx) {
 
 void PrintNode(const Node& node, const PrintContext& ctx) {
     std::visit(
-        [&ctx](const auto& value) {
-            PrintValue(value, ctx);
-        },
-        node.get_value());
+    [&ctx](const auto& value) {
+        PrintValue(value, ctx);
+    },
+    node.get_value());
 }
 
 }  // namespace

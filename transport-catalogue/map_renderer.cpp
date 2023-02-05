@@ -52,7 +52,7 @@ void MapRenderer::render_route_line() {
     }
 }
 
-void MapRenderer::busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p){
+void MapRenderer::busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p) {
     t.SetData(bus->name_);
     t.SetPosition(p);
     t.SetOffset(svg::Point(render_settings.bus_label_offset[0], render_settings.bus_label_offset[1]));
@@ -118,7 +118,7 @@ void MapRenderer::stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point
     t.SetFontFamily("Verdana");
 }
 
-void MapRenderer::render_stop_name(){
+void MapRenderer::render_stop_name() {
     std::set<Stop*, stop_compare> stops_in_alphabetical_ = t_c_.stops_in_alphabetical(buses_);
     svg::Color black_color("black");
 

@@ -109,19 +109,21 @@ class SphereProjector {
 
 
 class MapRenderer {
-public:
+  public:
     MapRenderer(const TransportCatalogue& t_c, const RenderSettings& rs):
-    t_c_(t_c), buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
+        t_c_(t_c), buses_(t_c.all_buses()), render_settings(rs), proj(render_coordinates()) {};
     void render_route_line();
     void render_bus_name();
     void render_stop_circle();
     void render_stop_name();
-    svg::Document& get_svg_doc() {return svg_doc;}
+    svg::Document& get_svg_doc() {
+        return svg_doc;
+    }
 
     void busname_with_ren_setting(Bus* bus, svg::Text &t, svg::Point p);
     void stopname_with_ren_setting(Stop* stop, svg::Text &t, svg::Point p);
     SphereProjector render_coordinates();
-private:
+  private:
     const TransportCatalogue& t_c_;
     svg::Document svg_doc;
     const std::set<Bus*, bus_compare>& buses_;

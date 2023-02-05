@@ -12,11 +12,11 @@
  * Если структура вашего приложения не позволяет так сделать, просто оставьте этот файл пустым.
  *
  */
-size_t Bus::route_size() {
+size_t Bus::route_size() const {
     return route_.size();
 }
 
-bool Bus::is_ring() {
+bool Bus::is_ring() const {
     return is_ring_;
 }
 /*

@@ -10,15 +10,19 @@
 #include <set>
 #include <numeric>
 #include "domain.h"
+#include "graph.h"
+#include <memory>
+#include "router.h"
 
 // напишите решение с нуля
 // код сохраните в свой git-репозиторий
 class TransportCatalogue {
   public:
+    long get_distance_between_stops_for_graph(std::string_view name1, std::string_view name2) const;
     void add_stop(const std::string& name, double lat, double lon);
     void add_distance_to_stop(std::string_view name1, std::string_view name2, long dist);
-    std::deque<Stop>& get_stops();
-    std::deque<Bus>& get_buses();
+    const std::deque<Stop>& get_stops() const;
+    const std::deque<Bus>& get_buses() const;
     Stop* pointer_stop_name(std::string_view name) const;
     Bus* pointer_bus_name(std::string_view name) const;
     const std::set<Bus*, bus_compare>& stopname_to_buses(const std::string_view name) const;
@@ -38,4 +42,5 @@ class TransportCatalogue {
     std::set<Bus*, bus_compare> null_buses;
     std::unordered_map<std::pair<Stop*, Stop*>, long, StopPtrHasher> stops_distance_;
     std::set<Bus*, bus_compare> all_buses_;
+    graph::VertexId vertex_counter_ = 0;
 };
