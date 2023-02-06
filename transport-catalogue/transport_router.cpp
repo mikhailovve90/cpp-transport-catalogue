@@ -50,9 +50,9 @@ void TransportRouter::add_circular_route_to_graph(const Bus* bus, const Transpor
             //Если достиг конца маршрута то с последняя остановка прибавляется, после этого ссаживаются пассажиры
             if(j == route_size - 2) {
                 flag = true;
-                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[route_size - 3]->name_, bus->route_[0]->name_) / (static_cast<double>(average_bus_speed_) * 1000.0)) * 60.0;
+                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[route_size - 3]->name_, bus->route_[0]->name_) / (static_cast<double>(average_bus_speed_) * meters_in_kilometer)) * minutes_in_hour;
             } else {
-                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j - 1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * 1000.0)) * 60.0;
+                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j - 1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * meters_in_kilometer)) * minutes_in_hour;
             }
             graph::Edge<double> travel_edge{bus->route_[i]->route_vertex, bus->route_[j]->start_vertex, integrated_time};
             edge_id = bus_route_graph_->AddEdge(travel_edge);
@@ -77,7 +77,7 @@ void TransportRouter::add_linear_route_to_graph(const Bus* bus, const TransportC
             std::deque<Stop*> stops_edge;
             stops_edge.push_back(bus->route_[i]);
             for(size_t j = i + 1; j < bus->route_size(); ++j) {
-                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j - 1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * 1000.0)) * 60.0;
+                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j - 1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * meters_in_kilometer)) * minutes_in_hour;
                 graph::Edge<double> travel_edge{bus->route_[i]->route_vertex, bus->route_[j]->start_vertex, integrated_time};
                 edge_id = bus_route_graph_->AddEdge(travel_edge);
                 stops_edge.push_back(bus->route_[j]);
@@ -90,7 +90,7 @@ void TransportRouter::add_linear_route_to_graph(const Bus* bus, const TransportC
             std::deque<Stop*> stops_edge;
             stops_edge.push_back(bus->route_[i]);
             for(int j = i - 1; j >= 0; --j) {
-                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j+1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * 1000.0))  * 60.0;
+                integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j+1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * meters_in_kilometer))  * minutes_in_hour;
                 graph::Edge<double> travel_edge{bus->route_[i]->route_vertex, bus->route_[j]->start_vertex, integrated_time};
                 graph::EdgeId edge_id = bus_route_graph_->AddEdge(travel_edge);
                 stops_edge.push_back(bus->route_[j]);

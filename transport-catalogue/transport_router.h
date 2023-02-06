@@ -27,4 +27,6 @@ class TransportRouter {
     std::unordered_map<graph::EdgeId, std::pair<const Bus*, std::deque<Stop*>>> edge_id_to_bus_;
     double wait_time_;
     double average_bus_speed_;
+    const double meters_in_kilometer = 1000.0;
+    const double minutes_in_hour = 60.0;
 };
