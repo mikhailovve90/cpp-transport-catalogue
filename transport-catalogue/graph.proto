@@ -1,0 +1,9 @@
+syntax = "proto3";
+package tc_serialize;
+message Edge {
+    string bus_name = 1;
+    int64 vertex_id_from = 2;
+    int64 vertex_id_to = 3;
+    double weight = 4;
+}
+

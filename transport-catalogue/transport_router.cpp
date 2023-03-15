@@ -11,6 +11,24 @@ void TransportRouter::set_bus_speed(int bus_speed) {
 void TransportRouter::set_wait_time(int wait_time) {
     wait_time_ = wait_time;
 }
+
+void TransportRouter::set_bus_speed(double bus_speed) {
+    average_bus_speed_ = bus_speed;
+}
+
+void TransportRouter::set_wait_time(double wait_time) {
+    wait_time_ = wait_time;
+}
+
+double TransportRouter::get_wait_time() {
+    return wait_time_;
+}
+
+double TransportRouter::get_bus_speed(){
+    return average_bus_speed_;
+}
+
+
 void TransportRouter::initialize_graph(const std::deque<Stop>& all_stops) {
     for(const Stop& stop : all_stops) {
         vertex_id_to_stop_[stop.start_vertex] = &stop;
@@ -38,13 +56,13 @@ void TransportRouter::add_circular_route_to_graph(const Bus* bus, const Transpor
         //Добавляю ребро от стартовой остановки до стартовой остановки плюс время ожидания
         graph::Edge<double> wait_edge{bus->route_[i]->start_vertex, bus->route_[i]->route_vertex, wait_time_};
         graph::EdgeId edge_id = bus_route_graph_->AddEdge(wait_edge);
-        edge_id_to_bus_[edge_id] = std::pair(bus, std::deque{bus->route_[i]});
+        EdgeInfo s_f_info{bus, bus->route_[i], 1};
+        edge_id_to_bus_[edge_id] = s_f_info;
         integrated_time = 0;
         bool flag = false;
         size_t stops_count = 0;
         //для накопления остановок в в ребре
-        std::deque<Stop*> stops_edge;
-        stops_edge.push_back(bus->route_[i]);
+        uint32_t size = 1;
         //минус три для поддержки старых запросов, когда конечная маршрута ещё не добавлялась в запросе последней, а добавлялась вручную
         for(size_t j = i + 1; stops_count < bus->route_size() - 3; ++j,++stops_count) {
             //Если достиг конца маршрута то с последняя остановка прибавляется, после этого ссаживаются пассажиры
@@ -57,8 +75,10 @@ void TransportRouter::add_circular_route_to_graph(const Bus* bus, const Transpor
             graph::Edge<double> travel_edge{bus->route_[i]->route_vertex, bus->route_[j]->start_vertex, integrated_time};
             edge_id = bus_route_graph_->AddEdge(travel_edge);
             //Добавка в дек элемента который будет включен в ребро
-            stops_edge.push_back(bus->route_[flag ? 0 : j]);
-            edge_id_to_bus_[edge_id] = std::move(std::pair(bus, stops_edge));
+            //stops_edge.push_back(bus->route_[flag ? 0 : j]);
+            ++size;
+            EdgeInfo edge_info{bus, bus->route_[i], size};
+            edge_id_to_bus_[edge_id] = edge_info;
             //Если мы достигли конца то завершаем
             if(flag) break;
         }
@@ -71,30 +91,30 @@ void TransportRouter::add_linear_route_to_graph(const Bus* bus, const TransportC
         for(size_t i = 0; i <= route_size - 1; ++i) {
             graph::Edge<double> wait_edge{bus->route_[i]->start_vertex, bus->route_[i]->route_vertex, wait_time_};
             graph::EdgeId edge_id = bus_route_graph_->AddEdge(wait_edge);
-
-            edge_id_to_bus_[edge_id] = std::pair(bus, std::deque{bus->route_[i]});
+            EdgeInfo s_f_info{bus, bus->route_[i], 1};
+            edge_id_to_bus_[edge_id] = s_f_info;
             integrated_time = 0;
-            std::deque<Stop*> stops_edge;
-            stops_edge.push_back(bus->route_[i]);
+            uint32_t size = 1;
             for(size_t j = i + 1; j < bus->route_size(); ++j) {
                 integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j - 1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * meters_in_kilometer)) * minutes_in_hour;
                 graph::Edge<double> travel_edge{bus->route_[i]->route_vertex, bus->route_[j]->start_vertex, integrated_time};
                 edge_id = bus_route_graph_->AddEdge(travel_edge);
-                stops_edge.push_back(bus->route_[j]);
-                edge_id_to_bus_[edge_id] = std::move(std::pair(bus, stops_edge));
+                ++size;
+                EdgeInfo edge_info{bus, bus->route_[i], size};
+                edge_id_to_bus_[edge_id] = edge_info;
             }
         }
         //Проход по обратному маршруту
         for(int i = route_size - 1; i > 0; --i) {
             integrated_time = 0;
-            std::deque<Stop*> stops_edge;
-            stops_edge.push_back(bus->route_[i]);
+            uint32_t size = 1;
             for(int j = i - 1; j >= 0; --j) {
                 integrated_time += (t_c.get_distance_between_stops_for_graph(bus->route_[j+1]->name_, bus->route_[j]->name_) / (static_cast<double>(average_bus_speed_) * meters_in_kilometer))  * minutes_in_hour;
                 graph::Edge<double> travel_edge{bus->route_[i]->route_vertex, bus->route_[j]->start_vertex, integrated_time};
                 graph::EdgeId edge_id = bus_route_graph_->AddEdge(travel_edge);
-                stops_edge.push_back(bus->route_[j]);
-                edge_id_to_bus_[edge_id] = std::pair(bus, stops_edge);
+                ++size;
+                EdgeInfo edge_info{bus, bus->route_[i], size};
+                edge_id_to_bus_[edge_id] = edge_info;
             }
         }
 }

@@ -2,6 +2,7 @@
 #include "json.h"
 #include "map_renderer.h"
 #include "transport_router.h"
+#include "serialization.h"
 /*
  * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
  * а также код обработки запросов к базе и формирование массива ответов в формате JSON
@@ -15,6 +16,7 @@ class JSONReader {
     JSONReader& parse_transport_catalogue(TransportCatalogue& t_c);
     JSONReader& parse_routing_settings(TransportRouter& t_c);
     JSONReader& parse_render_settings(RenderSettings& r_s);
+    JSONReader& parse_serialize_settings(SerializationTC& s_t_c);
     //std::vector<json::Node> json_stat_from_tc(std::vector<json::Node>& stat_requests, TransportCatalogue& t_c, RenderSettings& r_s);
     json::Node stop_req_processing(const std::map<std::string, json::Node>& map_node, const TransportCatalogue& t_c) const;
     json::Node bus_req_processing(const std::map<std::string, json::Node>& map_node, const BusInfo& b_i) const;
@@ -27,6 +29,7 @@ class JSONReader {
     json::Document& get_doc() {
         return doc_being_processed;
     }
+
   private:
     json::Document doc_being_processed;
     const std::string err_msg = "not found";

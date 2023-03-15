@@ -1,0 +1,46 @@
+syntax = "proto3";
+import public "svg.proto";
+import public "map_renderer.proto";
+import public "transport_router.proto";
+import public "graph.proto";
+package tc_serialize;
+
+message Coordinates {
+double latitude = 1;
+double longitude = 2;
+}
+
+// остановка
+message Stop {
+uint32 id = 1;
+string name = 2;
+Coordinates coordinate = 3;
+}
+
+// автобус
+message Bus {
+string name = 1;
+uint32 start = 2;
+uint32 stop = 3;
+repeated uint32 route = 4;
+bool is_circ = 5;
+}
+
+// расстояние между остановками
+message Distance {
+uint32 id1 = 1;
+uint32 id2 = 2;
+uint32 distance = 3;
+}
+
+// список остановок
+message Database {
+repeated Stop stops = 1;
+repeated Bus buses = 2;
+repeated Distance distances = 3;
+RenderSettings render_settings = 4;
+RouteSettings route_settings = 5;
+repeated Edge edges = 6;
+}
+
+

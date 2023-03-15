@@ -12,7 +12,6 @@ void TransportCatalogue::add_stop(const std::string& name, double lat, double lo
 }
 
 void TransportCatalogue::add_distance_to_stop(std::string_view name1, std::string_view name2, long dist) {
-
     stops_distance_[std::pair(pointer_stop_name(name1), pointer_stop_name(name2))] = dist;
 }
 

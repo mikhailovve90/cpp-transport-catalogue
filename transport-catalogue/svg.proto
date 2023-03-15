@@ -1,0 +1,24 @@
+syntax = "proto3";
+package tc_serialize;
+// остановка
+message Opacity {
+    double num = 1;
+}
+
+message RGB {
+uint32 red = 1;
+uint32 green = 2;
+uint32 blue = 3;
+Opacity opacity = 4;
+}
+
+message ColName {
+    string col_name = 1;
+}
+
+message Color {
+oneof variant {
+    ColName name = 1;
+    RGB rgb = 2;
+}
+}

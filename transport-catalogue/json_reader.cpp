@@ -5,7 +5,15 @@ json::Document json_reader::JSONReader::read_json(std::istream& input_stream) {
     return json::Load(input_stream);
 }
 
+json_reader::JSONReader& json_reader::JSONReader::parse_serialize_settings(SerializationTC& s_t_c) {
+    s_t_c.set_file_serialization_name(doc_being_processed.get_root().as_map().at("serialization_settings").as_map().at("file").as_string());
+    return *this;
+}
+
+
 json_reader::JSONReader& json_reader::JSONReader::parse_transport_catalogue(TransportCatalogue& t_c) {
+    //std::vector<json::Node> serialize_settings = doc_being_processed.get_root().as_map().at("serialization_settings").as_string();
+
     std::vector<json::Node> base_req = doc_being_processed.get_root().as_map().at("base_requests").as_array();
     //Для сбора информации о дистанциях и дальнейшем заполнении расстояний
     std::unordered_map<std::string, std::deque<std::pair<std::string, int>>> dist_map;
@@ -115,9 +123,11 @@ json_reader::JSONReader& json_reader::JSONReader::parse_render_settings(RenderSe
 }
 
 json_reader::JSONReader& json_reader::JSONReader::parse_routing_settings(TransportRouter& t_r) {
-    json::Dict route_set = doc_being_processed.get_root().as_map().at("routing_settings").as_map();
-    t_r.set_wait_time(route_set["bus_wait_time"].as_int());
-    t_r.set_bus_speed(route_set["bus_velocity"].as_int());
+    if(doc_being_processed.get_root().as_map().count("routing_settings")) {
+        json::Dict route_set = doc_being_processed.get_root().as_map().at("routing_settings").as_map();
+        t_r.set_wait_time(route_set["bus_wait_time"].as_int());
+        t_r.set_bus_speed(route_set["bus_velocity"].as_int());
+    }
     return *this;
 }
 
@@ -169,17 +179,17 @@ json::Node json_reader::JSONReader::route_req_processing(const std::map<std::str
         const graph::Edge edge = t_r.get_edge(ed_route);
         const auto current_edge = t_r.get_edge_content_from_edge_id(ed_route);
         json::Dict dict;
-        int size = current_edge.second.size();
+        int size = current_edge.size;
         if(size == 1) {
             dict = {
                 {"type", "Wait"},
-                {"stop_name", current_edge.second[0]->name_},
+                {"stop_name", current_edge.stop->name_},
                 {"time", edge.weight}
             };
         } else {
             dict = {
                 {"type", "Bus"},
-                {"bus", current_edge.first->name_},
+                {"bus", current_edge.bus->name_},
                 {"span_count", size - 1},
                 {"time", edge.weight}
             };

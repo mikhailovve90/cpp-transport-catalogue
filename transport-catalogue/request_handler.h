@@ -17,11 +17,13 @@
 
 class RequestHandler {
   public:
-    RequestHandler(const TransportCatalogue& t_c, MapRenderer& m_r, json_reader::JSONReader& doc) : transport_catalogue_(t_c), map_renderer_(m_r), doc_(doc) {
-        doc_.parse_routing_settings(transport_route_);
-        transport_route_.initialize_graph(transport_catalogue_.get_stops());
-        transport_route_.add_edges_buses_route_to_graph(transport_catalogue_);
-        transport_route_.initialize_router();
+    RequestHandler(const TransportCatalogue& t_c, MapRenderer& m_r, json_reader::JSONReader& doc, bool init_router) : transport_catalogue_(t_c), map_renderer_(m_r), doc_(doc) {
+         if(init_router){
+            doc_.parse_routing_settings(transport_route_);
+            //transport_route_.initialize_graph(transport_catalogue_.get_stops());
+            //transport_route_.add_edges_buses_route_to_graph(transport_catalogue_);
+            //transport_route_.initialize_router();
+         }
     }
     BusInfo get_bus_info(Bus* bus);
 
@@ -31,6 +33,13 @@ class RequestHandler {
     const MapRenderer& get_map_renderer() {
         return map_renderer_;
     }
+
+    TransportRouter& get_tansport_router() {
+        return transport_route_;
+    }
+
+    void reinitialize_router();
+
     void render_map(std::ostream& out);
     std::vector<json::Node> process_requests();
     json::Node& building_node();

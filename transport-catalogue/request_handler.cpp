@@ -93,3 +93,9 @@ json::Node& RequestHandler::building_node() {
     build_node_ = builder.Build();
     return build_node_;
 }
+
+void RequestHandler::reinitialize_router() {
+    transport_route_.initialize_graph(transport_catalogue_.get_stops());
+    transport_route_.add_edges_buses_route_to_graph(transport_catalogue_);
+    transport_route_.initialize_router();
+}

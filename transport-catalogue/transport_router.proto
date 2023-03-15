@@ -1,0 +1,7 @@
+syntax = "proto3";
+package tc_serialize;
+
+message RouteSettings {
+    double wait_time = 1;
+    double average_bus_speed =2;
+}

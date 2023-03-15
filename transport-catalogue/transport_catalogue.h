@@ -33,6 +33,7 @@ class TransportCatalogue {
     const std::set<Bus*, bus_compare>& all_buses() const;
     std::set<Stop*, stop_compare> stops_in_alphabetical(const std::set<Bus*, bus_compare>& buses) const;
 
+
   private:
     std::deque<Stop> stops_;//контейнер существующих остановок
     std::unordered_map<std::string_view, Stop*> stopname_to_stop_;//контейнер для быстрого нахождения указателя на остановку по имени
